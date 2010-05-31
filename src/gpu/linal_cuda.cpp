@@ -48,11 +48,8 @@
 
 #include "linal.h"
 #include "linal_cuda.h"
-#include "ver.h"
 
-VERSION("$Id$");
-
-namespace phelm {
+namespace linal {
 
 double vec_scalar2(const double * a, const double * b, int n)
 {

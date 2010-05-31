@@ -42,12 +42,7 @@
 #include <string.h>
 #include <float.h>
 
-#include "util.h"
-#include "ver.h"
-
-VERSION ("$Id$");
-
-namespace phelm
+namespace linal
 {
 
 /**
@@ -356,17 +351,5 @@ int check_device_supports_double()
 	return 1;
 }
 
-void phelm_init()
-{
-}
-
-void phelm_shutdown()
-{
-}
-
-void phelm_sync()
-{
-}
-
-} /* namespace phelm */
+} /* namespace linal */
 

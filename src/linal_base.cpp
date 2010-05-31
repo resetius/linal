@@ -46,12 +46,9 @@
 #include <omp.h>
 #endif
 
-#include "util.h"
-#include "ver.h"
+#include "linal.h"
 
-VERSION ("$Id$");
-
-namespace phelm
+namespace linal
 {
 
 void set_num_threads (int threads)

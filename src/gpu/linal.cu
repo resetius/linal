@@ -44,10 +44,7 @@
 #include "linal_cuda.h"
 #include "shmem.h"
 #include "texture.h"
-#include "ver.h"
 #include "reduction.h"
-
-VERSION("$Id$");
 
 void vector_splay (int n, int threads_min, int threads_max, 
 	int grid_width, int *blocks, 
