@@ -54,7 +54,7 @@
 #include "linal.h"
 #include "util.h"
 
-namespace phelm
+namespace linal
 {
 
 void gmres_vec_sum2 (double * x, const double * q, const double * y, int j, int hz, int n);

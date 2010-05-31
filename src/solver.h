@@ -58,6 +58,7 @@
 #undef SUPERLU
 
 #include "gmres.h"
+#include "allocator.h"
 
 namespace linal
 {

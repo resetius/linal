@@ -51,7 +51,7 @@
 
 typedef unsigned int uint;
 
-namespace allocator
+namespace linal
 {
 
 /**

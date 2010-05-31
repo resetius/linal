@@ -29,6 +29,7 @@ endif (UMFPACK_SOURCE_FOUND)
 if (UMFPACK)
 message(STATUS "UMFPACK library: ${UMFPACK}")
 else (UMFPACK)
+message(STATUS "UMFPACK library not found, using builtin GMRES")
 add_definitions(-DGMRES)
 endif (UMFPACK)
 
