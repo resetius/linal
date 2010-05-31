@@ -1,0 +1,1 @@
+project(linal_src)
