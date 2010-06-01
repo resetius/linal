@@ -5,7 +5,7 @@
 #include <cublas.h>
 #include <cuda_runtime_api.h>
 
-namespace phelm {
+namespace linal {
 
 template <class T> class cuda_allocator
 {
