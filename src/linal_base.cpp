@@ -61,6 +61,45 @@ void set_num_threads (int threads)
 #endif
 }
 
+void transpose(double * out, const double * in, int n, int m)
+{
+        for (int i = 0; i < n; ++i) {
+                for (int j = 0; j < m; ++j) {
+                        out[j * n + i] = in[i * m + j];
+                }
+        }
+}
+
+void transpose1(double * out, const double * in, double k, int n, int m)
+{
+        for (int i = 0; i < n; ++i) {
+                for (int j = 0; j < m; ++j) {
+                        out[j * n + i] = k * in[i * m + j];
+                }
+        }
+}
+
+void fprintfwmatrix(FILE * f, const double * u, int nlat, int nlon, const char * format)
+{
+        for (int i = 0; i < nlat; ++i) {
+                for (int j = 0; j < nlon; ++j) {
+                        fprintf(f, format, u[i * nlon + j]);
+                }
+                fprintf(f, "\n");
+        }
+}
+
+void fprintfwmatrix(const char * fname, const double * u, int nlat, int nlon, const char * format)
+{
+        FILE * f = fopen(fname, "w");
+        if (!f) {
+                fprintf(stderr, "cannot open %s\n", fname);
+                exit(1);
+        }
+        fprintfwmatrix(f, u, nlat, nlon, format);
+        fclose(f);
+}
+
 /**
  * Gauss
  * Copyright (c) 2009 Andrey Kornev, Andrey Ivanchikov, Alexey Ozeritsky

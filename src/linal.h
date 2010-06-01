@@ -101,6 +101,25 @@ void vec_print (const double * A, int n);
 void vec_print (const float * A, int n);
 
 /**
+ * nxm matrix transpose.
+ */
+void transpose (double * out, const double * in, int n, int m);
+/**
+ * nxm matrix transpose and multiply by k.
+ */
+void transpose1 (double * out, const double * in, double k, int n, int m);
+
+/**
+ * print nxm matrix into file f.
+ */
+void fprintfwmatrix(FILE * f, const double * u, int n, int m, const char * format);
+
+/**
+ * print nxm matrix into file fname.
+ */
+void fprintfwmatrix(const char * fname, const double * u, int n, int m, const char * format);
+
+/**
  * Product of NxN matrix and vector
  * @param r - output vector, r = Ax
  * @param A - intput matrix
@@ -447,5 +466,7 @@ void set_num_threads (int threads);
  */
 
 } /* namespace */
+
+#include "linal_util.h"
 
 #endif /* PHELM_LA_H */
