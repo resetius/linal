@@ -55,6 +55,7 @@ double vec_scalar2(const double * a, const double * b, int n)
 {
 	return cublasDdot(n, a, 1, b, 1);
 }
+
 /*
 float vec_scalar2(const float * a, const float * b, int n)
 {

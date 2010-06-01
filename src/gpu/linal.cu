@@ -82,7 +82,7 @@ register_texture(int, texAI);
 register_texture(float, texA);
 register_texture(float, texB);
 
-namespace phelm {
+namespace linal {
 
 template < typename T, typename APR, typename AIR, typename XR, typename AXR >
 __global__ void sparse_mult_vector_csr_(T * r, 
