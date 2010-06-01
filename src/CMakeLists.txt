@@ -5,6 +5,10 @@ include_directories(.)
 set(SOURCE
 	linal_base.cpp
 	linal.h
+
+	linal_util.h
+	util.cpp
+
 	gmres.cpp
 	gmres.h
 
