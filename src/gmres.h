@@ -50,7 +50,6 @@
 
 #include <math.h>
 
-#include "base.h"
 #include "linal.h"
 #include "util.h"
 

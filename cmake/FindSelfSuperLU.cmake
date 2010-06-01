@@ -6,8 +6,8 @@ endif (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${LINAL_HOME}/contrib/superlu/sup
 
 if (SUPERLU_SOURCE_FOUND)
 	set(SUPERLU superlu blas)
-	include_directories(${PHELM_SUBDIR}contrib/superlu)
-	add_definitions(-DSUPERLU)
+	list(APPEND LINAL_INCLUDE ${LINAL_HOME}/contrib/superlu)
+	list(APPEND LINAL_DEFINES -DSUPERLU)
 	message(STATUS "SuperLU source found!")
 endif (SUPERLU_SOURCE_FOUND)
 
@@ -19,11 +19,13 @@ endif (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${LINAL_HOME}/contrib/superlu_mt/
 
 if (SUPERLU_MT_SOURCE_FOUND)
 	set(SUPERLU superlu blas) # fixme
-	include_directories(${LINAL_HOME}contrib/superlu_mt)
-	add_definitions(-DSUPERLU -DSUPERLU_MT)
+	list(APPEND LINAL_INCLUDE ${LINAL_HOME}/contrib/superlu_mt)
+	list(APPEND LINAL_DEFINES -DSUPERLU -DSUPERLU_MT)
 	message(STATUS "SuperLU_MT source found!")
 endif (SUPERLU_MT_SOURCE_FOUND)
 
 if (SUPERLU)
 message(STATUS "SuperLU: ${SUPERLU}")
+list(APPEND LINAL_LIBS ${SUPERLU})
 endif (SUPERLU)
+

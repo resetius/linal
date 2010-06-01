@@ -351,5 +351,17 @@ int check_device_supports_double()
 	return 1;
 }
 
+void linal_init()
+{
+}
+
+void linal_shutdown()
+{
+}
+
+void linal_sync()
+{
+}
+
 } /* namespace linal */
 

@@ -70,7 +70,7 @@ int check_device_supports_double()
 	return pi1 == pi2;
 }
 
-void phelm_init()
+void linal_init()
 {
 	if (cublasInit() != CUBLAS_STATUS_SUCCESS)
 	{
@@ -93,12 +93,12 @@ void phelm_init()
 	fprintf(stderr, "maxgridsize: %d %d %d\n", prop.maxGridSize[0], prop.maxGridSize[1], prop.maxGridSize[2]);
 }
 
-void phelm_shutdown()
+void linal_shutdown()
 {
 	cublasShutdown();
 }
 
-void phelm_sync()
+void linal_sync()
 {
 	cudaThreadSynchronize();
 }

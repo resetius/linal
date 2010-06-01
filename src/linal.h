@@ -436,6 +436,9 @@ struct ArrayDevice: public Array < T, Allocator < T > >
 typedef Array < double, Allocator < double > > vec;
 
 int check_device_supports_double();
+void linal_init();
+void linal_shutdown();
+void linal_sync();
 
 void set_num_threads (int threads);
 

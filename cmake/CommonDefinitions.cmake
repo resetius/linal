@@ -2,7 +2,14 @@ if (MSVC)
         add_definitions(/D_CRT_SECURE_NO_WARNINGS)
 endif (MSVC)
 
-#set(OpenMP_C_FLAGS "${OpenMP_C_FLAGS} -m32")
 add_definitions(${OpenMP_C_FLAGS})
-add_definitions(-DSPARSE)
+add_definitions(${LINAL_DEFINES})
+include_directories(${LINAL_INCLUDE})
+
+if (CUDA_FOUND)
+	set (LINAL_CUDA_LIBS ${LINAL_LIBS} PARENT_SCOPE)
+	list(APPEND LINAL_CUDA_LIBS linal_cu)
+endif ()
+
+list(APPEND LINAL_LIBS linal)
 
