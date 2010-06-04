@@ -51,7 +51,6 @@
 #include <math.h>
 
 #include "linal.h"
-#include "util.h"
 
 namespace linal
 {
