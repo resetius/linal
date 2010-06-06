@@ -12,4 +12,5 @@ if (CUDA_FOUND)
 endif ()
 
 list(APPEND LINAL_LIBS linal)
+list(APPEND LINAL_DEFINES -DSPARSE)
 

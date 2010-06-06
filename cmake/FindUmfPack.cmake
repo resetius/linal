@@ -1,7 +1,7 @@
 if (UMFPACK_SOURCE_FOUND)
-	list(APPEND LINAL_INCLUDE ${LINAL_HOME}/contrib/umfpack/UMFPACK/Include)
-	list(APPEND LINAL_INCLUDE ${LINAL_HOME}/contrib/umfpack/AMD/Include)
-	list(APPEND LINAL_INCLUDE ${LINAL_HOME}/contrib/umfpack/UFconfig)
+	list(APPEND LINAL_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/contrib/umfpack/UMFPACK/Include)
+	list(APPEND LINAL_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/contrib/umfpack/AMD/Include)
+	list(APPEND LINAL_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/contrib/umfpack/UFconfig)
 	set(UMFPACK umfpack)
 else (UMFPACK_SOURCE_FOUND)
 	# UMFPACK_LIBRARY_PATH, system libs
