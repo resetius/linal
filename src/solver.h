@@ -128,6 +128,8 @@ struct StoreCSR
 	 * главного минора размера mxm матрицы this.
 	 */
 	void add_matrix2 (const my_type & A, const T * vec);
+
+	void print();
 };
 
 template < typename T, template < class > class Alloc = Allocator >
@@ -185,6 +187,11 @@ struct StoreELL
 	{
 		assert (0);
 	}
+
+	void print()
+	{
+		// implement
+	}
 };
 
 template < typename Store1, typename Store2 >
@@ -208,6 +215,11 @@ struct DoubleStore
 		mult.add_matrix2 (A.mult, vec);
 		invert.add_matrix2 (A.invert, vec);
 	}
+
+	void print()
+	{
+		mult.print();
+	}
 };
 
 template < typename Store >
@@ -230,6 +242,11 @@ struct DoubleStore < Store, Store >
 	void add_matrix2 (const my_type & A, const typename Store::data_type * vec)
 	{
 		mult.add_matrix2 (A.mult, vec);
+	}
+
+	void print()
+	{
+		mult.print();
 	}
 };
 

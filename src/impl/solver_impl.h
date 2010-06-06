@@ -98,6 +98,12 @@ void StoreCSR < T, Alloc > ::add_matrix2 (const my_type & A, const T * x)
 }
 
 template < typename T, template < class > class Alloc >
+void StoreCSR < T, Alloc > ::print()
+{
+	sparse_print(&Ap_[0], &Ai_[0], &Ax_[0], n_, stdout);
+}
+
+template < typename T, template < class > class Alloc >
 void StoreELL < T, Alloc > ::load (const std::vector < row_t > & A)
 {
 	nz_ = 0; // non-null elements
@@ -222,7 +228,7 @@ void SparseSolver < T, MultStore, InvStore > ::mult_vector (T * out, const T * i
 template < typename T, typename MultStore, typename InvStore  >
 void SparseSolver < T, MultStore, InvStore > ::print()
 {
-	// implement !
+	store_.print();
 }
 
 template < typename T, typename MultStore, typename InvStore  >
