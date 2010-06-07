@@ -228,6 +228,7 @@ void SparseSolver < T, MultStore, InvStore > ::mult_vector (T * out, const T * i
 template < typename T, typename MultStore, typename InvStore  >
 void SparseSolver < T, MultStore, InvStore > ::print()
 {
+	prepare();
 	store_.print();
 }
 
