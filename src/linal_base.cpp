@@ -61,7 +61,7 @@ void set_num_threads (int threads)
 #endif
 }
 
-void transpose(double * out, const double * in, int n, int m)
+void mat_transpose(double * out, const double * in, int n, int m)
 {
         for (int i = 0; i < n; ++i) {
                 for (int j = 0; j < m; ++j) {
@@ -70,34 +70,13 @@ void transpose(double * out, const double * in, int n, int m)
         }
 }
 
-void transpose1(double * out, const double * in, double k, int n, int m)
+void mat_transpose1(double * out, const double * in, double k, int n, int m)
 {
         for (int i = 0; i < n; ++i) {
                 for (int j = 0; j < m; ++j) {
                         out[j * n + i] = k * in[i * m + j];
                 }
         }
-}
-
-void fprintfwmatrix(FILE * f, const double * u, int nlat, int nlon, const char * format)
-{
-        for (int i = 0; i < nlat; ++i) {
-                for (int j = 0; j < nlon; ++j) {
-                        fprintf(f, format, u[i * nlon + j]);
-                }
-                fprintf(f, "\n");
-        }
-}
-
-void fprintfwmatrix(const char * fname, const double * u, int nlat, int nlon, const char * format)
-{
-        FILE * f = fopen(fname, "w");
-        if (!f) {
-                fprintf(stderr, "cannot open %s\n", fname);
-                exit(1);
-        }
-        fprintfwmatrix(f, u, nlat, nlon, format);
-        fclose(f);
 }
 
 /**
@@ -180,26 +159,42 @@ int gauss (double *A, double *b, double *x, int n)
 }
 
 template < typename T >
-void mat_print_ (const T * A, int n)
+void mat_print_ (FILE * f, const T * A, int n, int m, const char * fmt)
 {
 	for (int i = 0; i < n; ++i)
 	{
 		for (int j = 0; j < n; ++j)
 		{
-			printf ("%9.2le ", A[i * n + j]);
+			fprintf (f, fmt, A[i * n + j]);
 		}
-		printf ("\n");
+		fprintf (f, "\n");
 	}
 }
 
-void mat_print (const float * A, int n)
+void mat_print (FILE * f, const float * A, int n, int m, const char * fmt)
 {
-	mat_print_ (A, n);
+	mat_print_ (f, A, n, m, fmt);
 }
 
-void mat_print (const double * A, int n)
+void mat_print (FILE * f, const double * A, int n, int m, const char * fmt)
 {
-	mat_print_ (A, n);
+	mat_print_ (f, A, n, m, fmt);
+}
+
+void mat_print (const char * fn, const float * A, int n, int m, const char * fmt)
+{
+	FILE * f = fopen(fn, "wb");
+	if (!f) return;
+	mat_print_ (f, A, n, m, fmt);
+	fclose(f);
+}
+
+void mat_print (const char * fn, const double * A, int n, int m, const char * fmt)
+{
+	FILE * f = fopen(fn, "wb");
+	if (!f) return;
+	mat_print_ (f, A, n, m, fmt);
+	fclose(f);
 }
 
 double vec_norm2 (const double * v, int n)
@@ -214,23 +209,39 @@ float vec_norm2 (const float * v, int n)
 }
 
 template < typename T >
-void vec_print_ (const T * A, int n)
+void vec_print_ (FILE * f, const T * A, int n, const char * fmt)
 {
 	for (int i = 0; i < n; ++i)
 	{
-		printf ("%9.2le ", A[i]);
+		fprintf (f, fmt, A[i]);
 	}
-	printf ("\n");
+	fprintf (f, "\n");
 }
 
-void vec_print (const double * A, int n)
+void vec_print (FILE * f, const double * A, int n, const char * fmt)
 {
-	vec_print_ (A, n);
+	vec_print_ (f, A, n, fmt);
 }
 
-void vec_print (const float * A, int n)
+void vec_print (FILE * f, const float * A, int n, const char * fmt)
 {
-	vec_print_ (A, n);
+	vec_print_ (f, A, n, fmt);
+}
+
+void vec_print (const char * fn, const double * A, int n, const char * fmt)
+{
+	FILE * f = fopen(fn, "wb");
+	if (!f) return;
+	vec_print_ (f, A, n, fmt);
+	fclose(f);
+}
+
+void vec_print (const char * fn, const float * A, int n, const char * fmt)
+{
+	FILE * f = fopen(fn, "wb");
+	if (!f) return;
+	vec_print_ (f, A, n, fmt);
+	fclose(f);
 }
 
 template < typename T >

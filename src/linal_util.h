@@ -90,16 +90,6 @@ extern "C"
 	 */
 	void set_fpe_except();
 
-	/**
-	 * Finds minimal element of vector.
-	 */
-	double vec_find_min (const double * v, int n);
-
-	/**
-	 * Finds maximal element of vector.
-	 */
-	double vec_find_max (const double * v, int n);
-
 	/** @} */
 
 #ifdef __cplusplus

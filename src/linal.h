@@ -73,51 +73,61 @@ namespace linal
 int gauss (double *A, double *b, double *x, int n);
 
 /**
- * Print NxN matrix to stdout.
+ * Print NxM matrix to file.
  * @param A - matrix
  * @param n - dimension
+ * @param m - dimension
+ * @param fmt - format
  */
-void mat_print (const double * A, int n);
+void mat_print (FILE * f, const double * A, int n, int m, const char * fmt);
+void mat_print (const char * f, const double * A, int n, int m, const char * fmt);
 
 /**
- * Print NxN matrix to stdout.
+ * Print NxM matrix to file.
  * @param A - matrix
  * @param n - dimension
+ * @param m - dimension
+ * @param fmt - format
  */
-void mat_print (const float * A, int n);
+void mat_print (FILE * f, const float * A, int n, int m, const char * fmt);
+void mat_print (const char * f, const float * A, int n, int m, const char * fmt);
 
 /**
- * Print vector to stdout.
+ * Print vector to file.
  * @param A - vector
  * @param n - dimension
+ * @param fmt - format
  */
-void vec_print (const double * A, int n);
+void vec_print (FILE * f, const double * A, int n, const char * fmt);
+void vec_print (const char * f, const double * A, int n, const char * fmt);
 
 /**
- * Print vector to stdout.
+ * Print vector to file.
  * @param A - vector
  * @param n - dimension
+ * @param fmt - format
  */
-void vec_print (const float * A, int n);
+void vec_print (FILE * f, const float * A, int n, const char * fmt);
+void vec_print (const char * f, const float * A, int n, const char * fmt);
+
+/**
+ * Finds minimal element of vector.
+ */
+double vec_find_min (const double * v, int n);
+
+/**
+ * Finds maximal element of vector.
+ */
+double vec_find_max (const double * v, int n);
 
 /**
  * nxm matrix transpose.
  */
-void transpose (double * out, const double * in, int n, int m);
+void mat_transpose (double * out, const double * in, int n, int m);
 /**
  * nxm matrix transpose and multiply by k.
  */
-void transpose1 (double * out, const double * in, double k, int n, int m);
-
-/**
- * print nxm matrix into file f.
- */
-void fprintfwmatrix(FILE * f, const double * u, int n, int m, const char * format);
-
-/**
- * print nxm matrix into file fname.
- */
-void fprintfwmatrix(const char * fname, const double * u, int n, int m, const char * format);
+void mat_transpose1 (double * out, const double * in, double k, int n, int m);
 
 /**
  * Product of NxN matrix and vector
