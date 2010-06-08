@@ -51,26 +51,6 @@
 extern "C"
 {
 
-	double vec_find_min (const double * v, int n)
-	{
-		double mn = v[0];
-		for (int i = 0; i < n; ++i)
-		{
-			if (v[i] < mn) mn = v[i];
-		}
-		return mn;
-	}
-
-	double vec_find_max (const double * v, int n)
-	{
-		double mx = v[0];
-		for (int i = 0; i < n; ++i)
-		{
-			if (v[i] > mx) mx = v[i];
-		}
-		return mx;
-	}
-
 #ifdef WIN32
 #include <windows.h>
 	void set_fpe_except()
