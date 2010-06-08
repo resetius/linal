@@ -51,6 +51,26 @@
 namespace linal
 {
 
+double vec_find_min (const double * v, int n)
+        {
+                double mn = v[0];
+                for (int i = 0; i < n; ++i)
+                {
+                        if (v[i] < mn) mn = v[i];
+                }
+                return mn;
+        }
+
+        double vec_find_max (const double * v, int n)
+        {
+                double mx = v[0];
+                for (int i = 0; i < n; ++i)
+                {
+                        if (v[i] > mx) mx = v[i];
+                }
+                return mx;
+        }
+
 void set_num_threads (int threads)
 {
 #ifdef _OPENMP
