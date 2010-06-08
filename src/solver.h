@@ -46,6 +46,8 @@
  * The Matrix class and linear system solver.
  */
 
+#include <assert.h>
+
 #include <vector>
 #include <map>
 

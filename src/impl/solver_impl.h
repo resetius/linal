@@ -35,8 +35,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <assert.h>
-
 template < typename T, template < class > class Alloc >
 void StoreCSR < T, Alloc > ::load (const std::vector < row_t > & A)
 {

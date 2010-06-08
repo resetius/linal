@@ -331,15 +331,15 @@ void csr_print_ (const int * Ap, const int * Ai,
 			i = Ai[i0];
 			for (k = i_old; k < i - 1; ++k)
 			{
-				fprintf (f, "%8.3lf ", 0.0);
+				fprintf (f, "%8.3le ", 0.0);
 			}
-			fprintf (f, "%8.3lf ", (double) *p);
+			fprintf (f, "%8.3le ", (double) *p);
 			i_old = i;
 		}
 
 		for (k = i_old + 1; k < n; ++k)
 		{
-			fprintf (f, "%8.3lf ", 0.0);
+			fprintf (f, "%8.3le ", 0.0);
 		}
 		fprintf (f, "\n");
 	}
