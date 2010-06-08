@@ -61,22 +61,44 @@ void set_num_threads (int threads)
 #endif
 }
 
-void mat_transpose(double * out, const double * in, int n, int m)
+int get_num_threads ()
 {
-        for (int i = 0; i < n; ++i) {
-                for (int j = 0; j < m; ++j) {
-                        out[j * n + i] = in[i * m + j];
-                }
-        }
+#ifdef _OPENMP
+	return omp_get_num_threads();
+#else
+	return 1;
+#endif
 }
 
-void mat_transpose1(double * out, const double * in, double k, int n, int m)
+int get_my_id ()
 {
-        for (int i = 0; i < n; ++i) {
-                for (int j = 0; j < m; ++j) {
-                        out[j * n + i] = k * in[i * m + j];
-                }
-        }
+#ifdef _OPENMP
+	return omp_get_thread_num();
+#else
+	return 1;
+#endif
+}
+
+void mat_transpose (double * out, const double * in, int n, int m)
+{
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < m; ++j)
+		{
+			out[j * n + i] = in[i * m + j];
+		}
+	}
+}
+
+void mat_transpose1 (double * out, const double * in, double k, int n, int m)
+{
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < m; ++j)
+		{
+			out[j * n + i] = k * in[i * m + j];
+		}
+	}
 }
 
 /**
@@ -183,18 +205,18 @@ void mat_print (FILE * f, const double * A, int n, int m, const char * fmt)
 
 void mat_print (const char * fn, const float * A, int n, int m, const char * fmt)
 {
-	FILE * f = fopen(fn, "wb");
+	FILE * f = fopen (fn, "wb");
 	if (!f) return;
 	mat_print_ (f, A, n, m, fmt);
-	fclose(f);
+	fclose (f);
 }
 
 void mat_print (const char * fn, const double * A, int n, int m, const char * fmt)
 {
-	FILE * f = fopen(fn, "wb");
+	FILE * f = fopen (fn, "wb");
 	if (!f) return;
 	mat_print_ (f, A, n, m, fmt);
-	fclose(f);
+	fclose (f);
 }
 
 double vec_norm2 (const double * v, int n)
@@ -230,18 +252,18 @@ void vec_print (FILE * f, const float * A, int n, const char * fmt)
 
 void vec_print (const char * fn, const double * A, int n, const char * fmt)
 {
-	FILE * f = fopen(fn, "wb");
+	FILE * f = fopen (fn, "wb");
 	if (!f) return;
 	vec_print_ (f, A, n, fmt);
-	fclose(f);
+	fclose (f);
 }
 
 void vec_print (const char * fn, const float * A, int n, const char * fmt)
 {
-	FILE * f = fopen(fn, "wb");
+	FILE * f = fopen (fn, "wb");
 	if (!f) return;
 	vec_print_ (f, A, n, fmt);
-	fclose(f);
+	fclose (f);
 }
 
 template < typename T >
@@ -249,45 +271,38 @@ void mat_mult_vector_ (T * r, const T * A, const T * x, int n)
 {
 #pragma omp parallel
 	{
-		int block_dim = 400; //cache size = (block_dim * block_dim * 8)
-		int blocks = (n + block_dim - 1) / block_dim;
+		int procs  = get_num_threads();
+		int blocks = procs;
+		int id     = get_my_id();
+		int f_row  = n * id;
+		f_row /= procs;
+		int l_row  = n * (id + 1);
+		l_row = l_row / procs - 1;
+		int m = id;
 
-#pragma omp for
-		for (int i = 0; i < n; ++i)
+		for (int i = f_row; i <= l_row; ++i)
 		{
 			r[i] = 0;
 		}
 
-		for (int l = 0; l < blocks; ++l )
+		for (int block = 0; block < blocks; ++block, m = (m + 1) % blocks)
 		{
-			int fl = n * l;
-			fl /= blocks;
-			int ll = n * (l + 1);
-			ll = ll / blocks - 1;
+			int fm = n * m;
+			fm /= blocks;
+			int lm = n * (m + 1);
+			lm = lm / blocks - 1;
 
-			for (int m = 0; m < blocks; ++m)
+			for (int i = f_row; i <= l_row; ++i)
 			{
-				int fm = n * m;
-				fm /= blocks;
-				int lm = n * (m + 1);
-				lm = lm / blocks - 1;
+				T s = 0.0;
+				const T * ax = &A[i * n + fm];
+				const T * xx = &x[fm];
 
-				// blocks:
-				// R[fl] += A[fl, fm] * X[fl]
-
-#pragma omp for
-				for (int i = fl; i <= ll; ++i)
+				for (int j = fm; j <= lm; ++j)
 				{
-					const T * ax = &A[i * n + fm];
-					const T * xx = &x[fm];
-
-					T s = 0.0;
-					for (int j = fm; j <= lm; ++j)
-					{
-						s += *ax++ * *xx++;
-					}
-					r[i] += s;
+					s += *ax++ * *xx++;
 				}
+				r[i] += s;
 			}
 		}
 	}

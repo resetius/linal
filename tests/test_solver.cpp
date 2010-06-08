@@ -18,7 +18,6 @@ void usage (const char * n)
 [--task] [--dim] [--iters] [--operator]\n", n);
 	fprintf (stderr, "--threads n - sets the number of threads\n");
 	fprintf (stderr, "--double - use double or float ? \n");
-	fprintf (stderr, "--operator - operator for mult_sparse \n");
 	fprintf (stderr, "--task - all\n"
 	         "mult_dense\n"
 	         "mult_sparse\n"
@@ -252,6 +251,7 @@ bool test_simple_mult (int n, int iters)
 	for (k = 0; k < iters; ++k)
 	{
 		mat_mult_vector (&x1[0], &M1[0], &b[0], n);
+//		mat_mult_vector_stupid(&x1[0], &M1[0], &b[0], n);
 	}
 	fprintf (stdout, "M1 (simple) mult_vector: %lf\n", t.elapsed() );
 #if 0 
