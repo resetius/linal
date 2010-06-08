@@ -7,7 +7,7 @@ add_definitions(${LINAL_DEFINES})
 include_directories(${LINAL_INCLUDE})
 
 if (CUDA_FOUND)
-	set (LINAL_CUDA_LIBS ${LINAL_LIBS} PARENT_SCOPE)
+	set (LINAL_CUDA_LIBS ${LINAL_LIBS})
 	list(APPEND LINAL_CUDA_LIBS linal_cu)
 endif ()
 
