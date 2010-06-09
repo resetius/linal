@@ -1,0 +1,2 @@
+1. run la_test_solver (mult_dense)
+2. make mult_dense GPU version
