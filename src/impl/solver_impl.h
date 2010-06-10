@@ -117,7 +117,7 @@ template < typename T, template < class > class Alloc >
 void StoreCSR < T, Alloc > ::restore(FILE * f)
 {
 	fread(&n_, sizeof(n_), 1, f);
-	fread(&nz, sizeof(nz_), 1, f);
+	fread(&nz_, sizeof(nz_), 1, f);
 	if (nz_) {
 		Ap_.resize(n_ + 1);
 		Ai_.resize(nz_);
@@ -192,7 +192,7 @@ void StoreELL < T, Alloc > ::dump (FILE * f)
 	fwrite(&stride_, sizeof(stride_), 1, f);
 	if (nz_) {
 		fwrite(&Ai_[0], sizeof(int), cols_ * stride_, f);
-		fwrite(&Ax_[0], sizeof(T), cols_ * stride, f);
+		fwrite(&Ax_[0], sizeof(T), cols_ * stride_, f);
 	}
 }
 
@@ -205,9 +205,9 @@ void StoreELL < T, Alloc > ::restore (FILE * f)
 	fread(&stride_, sizeof(stride_), 1, f);
 	if (nz_) {
 		Ai_.resize(cols_ * stride_);
-		Ap_.resize(cols_ * stride_);
+		Ax_.resize(cols_ * stride_);
 		fread(&Ai_[0], sizeof(int), cols_ * stride_, f);
-		fread(&Ax_[0], sizeof(T), cols_ * stride, f);
+		fread(&Ax_[0], sizeof(T), cols_ * stride_, f);
 	}
 }
 	
