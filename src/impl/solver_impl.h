@@ -96,9 +96,36 @@ void StoreCSR < T, Alloc > ::add_matrix2 (const my_type & A, const T * x)
 }
 
 template < typename T, template < class > class Alloc >
-void StoreCSR < T, Alloc > ::print()
+void StoreCSR < T, Alloc > ::print(FILE * f)
 {
-	sparse_print(&Ap_[0], &Ai_[0], &Ax_[0], n_, stdout);
+	sparse_print(&Ap_[0], &Ai_[0], &Ax_[0], n_, f);
+}
+
+template < typename T, template < class > class Alloc >
+void StoreCSR < T, Alloc > ::dump(FILE * f)
+{
+	fwrite(&n_,  sizeof(n_), 1, f);
+	fwrite(&nz_, sizeof(nz_), 1, f);
+	if (nz_) {
+		fwrite(&Ap_[0], sizeof(int), Ap_.size(), f);
+		fwrite(&Ai_[0], sizeof(int), nz_, f);
+		fwrite(&Ax_[0], sizeof(T), nz_, f);
+	}
+}
+
+template < typename T, template < class > class Alloc >
+void StoreCSR < T, Alloc > ::restore(FILE * f)
+{
+	fread(&n_, sizeof(n_), 1, f);
+	fread(&nz, sizeof(nz_), 1, f);
+	if (nz_) {
+		Ap_.resize(n_ + 1);
+		Ai_.resize(nz_);
+		Ax_.resize(nz_);
+		fread(&Ap_[0], sizeof(int), n_ + 1, f);
+		fread(&Ai_[0], sizeof(int), nz_, f);
+		fread(&Ax_[0], sizeof(T), nz_, f);
+	}
 }
 
 template < typename T, template < class > class Alloc >
@@ -156,6 +183,34 @@ void StoreELL < T, Alloc > ::mult (T * r, const T * x) const
 	ell_mult_vector_r (r, &Ai_[0], &Ax_[0], x, n_, cols_, stride_);
 }
 
+template < typename T, template < class > class Alloc >
+void StoreELL < T, Alloc > ::dump (FILE * f)
+{
+	fwrite(&n_, sizeof(n_), 1, f);
+	fwrite(&nz_, sizeof(nz_), 1, f);
+	fwrite(&cols_, sizeof(cols_), 1, f);
+	fwrite(&stride_, sizeof(stride_), 1, f);
+	if (nz_) {
+		fwrite(&Ai_[0], sizeof(int), cols_ * stride_, f);
+		fwrite(&Ax_[0], sizeof(T), cols_ * stride, f);
+	}
+}
+
+template < typename T, template < class > class Alloc >
+void StoreELL < T, Alloc > ::restore (FILE * f)
+{
+	fread(&n_, sizeof(n_), 1, f);
+	fread(&nz_, sizeof(nz_), 1, f);
+	fread(&cols_, sizeof(cols_), 1, f);
+	fread(&stride_, sizeof(stride_), 1, f);
+	if (nz_) {
+		Ai_.resize(cols_ * stride_);
+		Ap_.resize(cols_ * stride_);
+		fread(&Ai_[0], sizeof(int), cols_ * stride_, f);
+		fread(&Ax_[0], sizeof(T), cols_ * stride, f);
+	}
+}
+	
 template < typename T >
 void SimpleSolver < T > ::mult_vector (T * out, const T * in)
 {
@@ -181,9 +236,9 @@ void SimpleSolver < T > ::add (int i, int j, T a)
 }
 
 template < typename T >
-void SimpleSolver < T > ::print()
+void SimpleSolver < T > ::print(FILE * f)
 {
-	print_matrix (&A_[0], n_);
+	mat_print (f, &A_[0], n_, n_, "%23.16le ");
 }
 
 template < typename T, typename MultStore, typename InvStore  >
@@ -224,10 +279,24 @@ void SparseSolver < T, MultStore, InvStore > ::mult_vector (T * out, const T * i
 }
 
 template < typename T, typename MultStore, typename InvStore  >
-void SparseSolver < T, MultStore, InvStore > ::print()
+void SparseSolver < T, MultStore, InvStore > ::print(FILE * f)
 {
 	prepare();
-	store_.print();
+	store_.print(f);
+}
+
+template < typename T, typename MultStore, typename InvStore  >
+void SparseSolver < T, MultStore, InvStore > ::dump(FILE * f)
+{
+	prepare();
+	store_.dump(f);
+}
+
+template < typename T, typename MultStore, typename InvStore  >
+void SparseSolver < T, MultStore, InvStore > ::restore(FILE * f)
+{
+	prepare();
+	store_.restore(f);
 }
 
 template < typename T, typename MultStore, typename InvStore  >

@@ -3,7 +3,7 @@
 /* -*- charset: utf-8 -*- */
 /*$Id$*/
 
-/* Copyright (c) 2009 Alexey Ozeritsky (Алексей Озерицкий)
+/* Copyright (c) 2009-2010 Alexey Ozeritsky (Алексей Озерицкий)
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -131,7 +131,9 @@ struct StoreCSR
 	 */
 	void add_matrix2 (const my_type & A, const T * vec);
 
-	void print();
+	void print(FILE * f);
+	void dump(FILE * f);
+	void restore(FILE * f);
 };
 
 template < typename T, template < class > class Alloc = Allocator >
@@ -190,10 +192,13 @@ struct StoreELL
 		assert (0);
 	}
 
-	void print()
+	void print(FILE * f)
 	{
 		// implement
 	}
+
+	void dump(FILE * f);
+	void restore(FILE * f);
 };
 
 template < typename Store1, typename Store2 >
@@ -218,9 +223,21 @@ struct DoubleStore
 		invert.add_matrix2 (A.invert, vec);
 	}
 
-	void print()
+	void print(FILE * f)
 	{
-		mult.print();
+		mult.print(f);
+	}
+
+	void dump(FILE * f)
+	{
+		mult.dump(f);
+		invert.dump(f);
+	}
+
+	void restore(FILE * f)
+	{
+		mult.restore(f);
+		invert.restore(f);
 	}
 };
 
@@ -246,9 +263,14 @@ struct DoubleStore < Store, Store >
 		mult.add_matrix2 (A.mult, vec);
 	}
 
-	void print()
+	void print(FILE * f)
 	{
-		mult.print();
+		mult.print(f);
+	}
+
+	void restore(FILE * f)
+	{
+		mult.restore(f);
 	}
 };
 
@@ -300,9 +322,11 @@ public:
 	void mult_vector (T * out, const T * in);
 
 	/**
-	 * print matrix to stdout.
+	 * print matrix to file.
 	 */
-	void print();
+	void print(FILE * f);
+	void dump(FILE * f);
+	void restore(FILE * f);
 
 	/**
 	 * fill permanent storage from temporary storage
@@ -361,9 +385,11 @@ public:
 	void mult_vector (T * out, const T * in);
 
 	/**
-	 * print matrix to stdout.
+	 * print matrix to file.
 	 */
-	void print();
+	void print(FILE * f);
+	void dump(FILE * f);
+	void restore(FILE * f);
 
 	/**
 	 * Do nothing. For compatibility with sparse solvers.
