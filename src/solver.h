@@ -268,6 +268,11 @@ struct DoubleStore < Store, Store >
 		mult.print(f);
 	}
 
+	void dump(FILE * f)
+	{
+		mult.dump(f);
+	}
+
 	void restore(FILE * f)
 	{
 		mult.restore(f);
