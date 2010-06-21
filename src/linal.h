@@ -47,6 +47,7 @@
  * - matrix vector operations
  *   - matrix vector product
  * - linear systems solver
+ * - input/output for vectors and matrices
  *
  * The library supports the following matrices types
  * - dense
