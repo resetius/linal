@@ -35,6 +35,40 @@
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @endverbatim
+ *
+ * @mainpage Linal Documentation
+ * @section into_sec Introduction
+ *
+ * This library contains linear algebra subprograms such as
+ * - vector operations 
+ *   - vectors sum
+ *   - dot products 
+ *   - vector norm
+ * - matrix vector operations
+ *   - matrix vector product
+ * - linear systems solver
+ *
+ * The library supports the following matrices types
+ * - dense
+ * - sparse
+ *   - CSR
+ *   - ELL 
+ * 
+ * The linear system solver supports the following backends
+ * - Gauss (for dense matrices)
+ * - SuperLU (http://crd.lbl.gov/~xiaoye/SuperLU/)
+ * - UMFPACK (http://www.cise.ufl.edu/research/sparse/umfpack/)
+ * - GMRES (included)
+ *
+ * The vector operations subprograms have the following backends
+ * - Simple
+ * - OpenMP
+ * - CUDA
+ *
+ * The library supports the following data types
+ * - float
+ * - double
+ *
  */
 
 #include <stdio.h>
