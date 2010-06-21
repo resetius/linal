@@ -2,7 +2,7 @@
 #include "reduction.h"
 #include "texture.h"
 
-namespace phelm {
+namespace linal {
 
 template < typename T >
 __global__ void
