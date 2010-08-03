@@ -33,7 +33,13 @@ static void reverse_lower (double * x, const double *A, const double *b, int n)
 	}
 }
 
-void build_lu (double * L, double * U, const double * A, int n)
+void lu_solve(double * x, const double * L, const double * U, const double * b, int n)
+{
+	reverse_lower(x, L, b, n);
+	reverse_upper(x, U, x, n);
+}
+
+void lu_build (double * L, double * U, const double * A, int n)
 {
 	int i, j, k;
 	memcpy (U, A, n * n * sizeof (double) );
@@ -142,7 +148,7 @@ int main()
 
 	fprintf (stderr, "A:\n");
 	mat_print (A, n);
-	build_lu (L, U, A, n);
+	lu_build (L, U, A, n);
 	fprintf (stderr, "L:\n");
 	mat_print (L, n);
 	fprintf (stderr, "U:\n");
