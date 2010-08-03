@@ -9,6 +9,8 @@ set(SOURCE
 	linal_util.h
 	util.cpp
 
+	lu_solve.c
+
 	gmres.h
 
 	impl/solver_impl.h
