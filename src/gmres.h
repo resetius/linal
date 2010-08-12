@@ -47,9 +47,6 @@
 namespace linal
 {
 
-void gmres_vec_sum2 (double * x, const double * q, const double * y, int j, int hz, int n);
-void gmres_vec_sum2 (float * x, const float * q, const float * y, int j, int hz, int n);
-
 /**
  * Demmel Algorithm  6.9 p 303
  */

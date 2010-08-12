@@ -32,19 +32,46 @@
 #include <string.h>
 #include <math.h>
 
-#include "gmres.h"
-#include "ver.h"
+static void vec_diff(double * r, const double * a, const double * b, int n)
+{
+	int i;
+	for (i = 0; i < n; ++i) {
+		r[i] = a[i] - b[i];
+	}
+}
 
-VERSION("$Id$");
+void vec_mult_scalar(double * a, const double * b, double k, int n)
+{
+	int i;
+	for (i = 0; i < n; ++i) {
+		a[i] = b[i] * k;
+	}
+}
 
-void vec_diff(double * r, const double * a, const double * b, int n);
-void vec_mult_scalar(double * a, const double * b, double k, int n);
-void vec_sum2(double * r, const double * a, const double *b, double k2, int n);
+void vec_sum2(double * r, const double * a, const double *b, double k2, int n)
+{
+	int i;
+	for (i = 0; i < n; ++i) {
+		r[i] = a[i] + b[i] * k2;
+	}
+}
 
-double vec_norm2(const double *v, int n);
-double vec_scalar2(const double * a, const double * b, int n);
+double vec_scalar2(const double * a, const double * b, int n)
+{
+	int i;
+	double s = 0;
+	for (i = 0; i < n; ++i) {
+		s += a[i] * b[i];
+	}
+	return s;
+}
 
-double get_full_time();
+double vec_norm2(const double *v, int n)
+{
+	return sqrt(vec_scalar2(v, v, n));
+}
+
+typedef void (*Ax_t)(double * y, const double * A, const double * x, int n);
 
 /**
  * Demmel Algorithm  6.9 p 303
@@ -192,17 +219,18 @@ void gmres(double * x, const void * A, const double * b,
 
 	for (i = 0; i < max_it; ++i)
 	{
-		double t1 = get_full_time();
 		double e  = algorithm6_9(x, A, b, Ax, tol * bn, n, k_dim);
-		double t2 = get_full_time();
-		//double xn = vec_norm2(x, n);
 		e /= bn;
-		fprintf(stderr, "  gmres: iters = %d, eps = %le, t = %lf\n", i, e, 
-			(t2 - t1) / 100.0);
 		if (e < tol) {
 			return;
 		}
 	}
 }
 
+#ifdef TEST
+int main()
+{
+	return 0;
+}
+#endif
 
