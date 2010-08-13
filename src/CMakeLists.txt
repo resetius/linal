@@ -9,8 +9,6 @@ set(SOURCE
 	linal_util.h
 	util.cpp
 
-	lu_solve.c
-
 	gmres.h
 
 	impl/solver_impl.h
@@ -21,6 +19,8 @@ set(SOURCE
 add_library(linal
 	${SOURCE}
 	linal.cpp
+	lu_solve.cpp
+	lu_solve.h
 	mv_dense.cpp
 	mv_dense.h
 	mv_csr.cpp

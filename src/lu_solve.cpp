@@ -32,6 +32,8 @@
 #include <string.h>
 #include <math.h>
 
+namespace linal {
+
 static void reverse_upper (double * x, const double *A, const double *b, int n)
 {
 	int j, k;
@@ -139,8 +141,12 @@ void lu_build (double * L, double * U, const double * A, int n)
 	}
 }
 
+} /* namespace linal */
+
 #ifdef TEST
 #define N 10
+
+using namespace linal;
 
 static void mat_print (const double * A, int n)
 {
@@ -157,9 +163,9 @@ static void mat_print (const double * A, int n)
 
 int main()
 {
-	double * A = malloc (N * N * sizeof (double) );
-	double * L = malloc (N * N * sizeof (double) );
-	double * U = malloc (N * N * sizeof (double) );
+	double * A = (double *)malloc (N * N * sizeof (double) );
+	double * L = (double *)malloc (N * N * sizeof (double) );
+	double * U = (double *)malloc (N * N * sizeof (double) );
 	int i, j, k;
 	int n = N;
 

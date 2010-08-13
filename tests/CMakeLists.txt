@@ -6,6 +6,9 @@ include_directories(${LINAL_INCLUDE})
 add_executable(la_test_solver test_solver.cpp)
 target_link_libraries(la_test_solver ${LINAL_LIBS})
 
+add_definitions(-DTEST)
+add_executable(la_test_lu ../src/lu_solve.cpp)
+
 if (OPENMP_FOUND)
 	set_target_properties(la_test_solver PROPERTIES LINK_FLAGS ${OpenMP_C_FLAGS})
 endif (OPENMP_FOUND)
