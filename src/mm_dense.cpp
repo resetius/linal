@@ -28,6 +28,7 @@
  */
 
 #include <string.h>
+#include <math.h>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -35,7 +36,24 @@
 
 #include "timer.h"
 
-extern "C"
+namespace linal
+{
+
+void
+mat_mult_mat_stupid(double * C, const double * A, const double * B, int n)
+{
+#pragma omp parallel for
+	for (int i = 0; i < n; ++i) {
+		for (int j = 0; j < n; ++j) {
+			double s = 0;
+			for (int k = 0; k < n; ++k) {
+				s += A[i * n + k] * B[k * n + j];
+			}
+			C[i * n + j] = s;
+		}
+	}
+}
+
 void
 mat_mult_mat(double * C, const double * A, const double * B, int n)
 {
@@ -129,21 +147,64 @@ mat_mult_mat(double * C, const double * A, const double * B, int n)
 
 }
 
+}
+
 #ifdef TEST
 #include <vector>
 #include <stdio.h>
 
 using namespace std;
+using namespace linal;
+
 #define N 2048L
 
 int main()
 {
-	vector < double > A(N * N);
-	vector < double > B(N * N);
-	vector < double > C(N * N);
-	double t  = get_full_time();
+	int n = N;
+	vector < double > A(n * n);
+	vector < double > B(n * n);
+	vector < double > C(n * n);
+	vector < double > reference(n * n);
+
+	for (int i = 0; i < n; ++i) {
+		for (int j = 0; j < n; ++j) {
+			if (i > j) {
+				A[i * n + j] = 1. / (1. + i + j);
+				B[i * n + j] = (2. + i + j);
+			} else {
+				A[i * n + j] = -1. / (1. + i + j);
+				B[i * n + j] = -(2. + i + j);
+			}
+		}
+	}
+
+	double t, seconds;
+	t = get_full_time();
 	//omp_set_num_threads(4);
-	mat_mult_mat(&C[0], &A[0], &B[0], N);
-	printf("%lf\n", (get_full_time() - t) / 100.0);
+	mat_mult_mat(&C[0], &A[0], &B[0], n);
+	seconds = (get_full_time() - t) / 100.0;
+	printf("t=%lf, gflops=%lf\n", seconds, 
+		1e-9 * 2.0 * (double)n * (double)n * (double)n / seconds);
+
+	// check
+
+#if 0
+	t = get_full_time();
+	mat_mult_mat_stupid(&reference[0], &A[0], &B[0], n);
+	seconds = (get_full_time() - t) / 100.0;
+	printf("t=%lf, gflops=%lf\n", seconds, 
+		1e-9 * 2.0 * (double)n * (double)n * (double)n / seconds);
+
+	for (int i = 0; i < n * n; ++i) {
+		if (fabs(reference[i] - C[i]) > 1e-11) {
+			printf("error ! \n %.16le != %.16le\n", reference[i], C[i]);
+			return -1;
+		}
+	}
+
+	printf("test passed!\n");
+#endif
+
+	return 0;
 }
 #endif
