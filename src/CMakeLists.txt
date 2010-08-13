@@ -41,6 +41,8 @@ if (CUDA_FOUND)
 		gpu/texture.h
 		gpu/shmem.h
 		gpu/reduction.h
-		gpu/gmres.cu)
+		gpu/gmres.cu
+		OPTIONS --generate-code arch=compute_11,code=compute_11 --generate-code arch=compute_13,code=compute_13 --generate-code arch=compute_20,code=compute_20
+		)
 endif ()
 
