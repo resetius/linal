@@ -1,7 +1,9 @@
+#ifndef LINAL_FPE_H
+#define LINAL_FPE_H
 /* -*- charset: utf-8 -*- */
 /*$Id$*/
 
-/* Copyright (c) 2009 Alexey Ozeritsky (РђР»РµРєСЃРµР№ РћР·РµСЂРёС†РєРёР№)
+/* Copyright (c) 2009 Alexey Ozeritsky (Алексей Озерицкий)
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +29,35 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifdef _OPENMP
-#include <omp.h>
+#ifdef __cplusplus
+extern "C"
+{
 #endif
+
+/**
+ * @defgroup misc Miscellaneous functions and classes.
+ * @{
+ */
+/**
+ * Sets FPU exceptions.
+ */
+void set_fpe_except();
+
+#ifdef WIN32
+#include <float.h>
+#define isnan _isnan
+__inline bool isinf (double x)
+{
+	int c = _fpclass (x);
+	return (c == _FPCLASS_NINF || c == _FPCLASS_PINF);
+}
+#endif
+
+/** @} */
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* LINAL_FPE_H */
+

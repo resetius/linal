@@ -178,21 +178,6 @@ void csr_add_matrix2 (const int * oAp, float * oAx,
                       const float * x, int n);
 
 /**
- * ELL matrix multiplication: r = A x
- * @param r - output vector
- * @param Ai -
- * @param Ax -
- * @param x - input vector
- * @param n - the size of vector and matrix
- */
-void ell_mult_vector_r (double * r, const int * Ai,
-                        const double * Ax, const double * x,
-                        int n, int cols, int stride);
-void ell_mult_vector_r (float * r, const int * Ai,
-                        const float * Ax, const float * x,
-                        int n, int cols, int stride);
-
-/**
  * Print sparse matrix to file.
  * @param A - input sparse matrix
  * @param n - dimension of sparse matrix
@@ -460,6 +445,8 @@ void set_num_threads (int threads);
 #include "mv_csr.h"
 #include "mv_ell.h"
 #include "linal_util.h"
+#include "timer.h"
+#include "fpe.h"
 
 #endif /* PHELM_LA_H */
 

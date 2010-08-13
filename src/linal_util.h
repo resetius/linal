@@ -44,96 +44,37 @@ extern "C"
 {
 #endif
 
-	/**
-	 * @defgroup misc Miscellaneous functions and classes.
-	 * @{
-	 */
+/**
+ * @defgroup misc Miscellaneous functions and classes.
+ * @{
+ */
 
+/**
+ * Power function.
+ * @param x - value
+ * @param p - power
+ * @return the value of x raised to the power of p
+ */
 #ifdef WIN32
-#define inline __inline
+__inline
+#else
+inline
 #endif
-
-	/**
-	 * Power function.
-	 * @param x - value
-	 * @param p - power
-	 * @return the value of x raised to the power of p
-	 */
-	inline double
-	ipow (double x, int p)
+double ipow (double x, int p)
+{
+	int i;
+	double r = 1;
+	for (i = 0; i < p; i++)
 	{
-		int i;
-		double r = 1;
-		for (i = 0; i < p; i++)
-		{
-			r *= x;
-		}
-		return r;
+		r *= x;
 	}
-
-	/**
-	 * Returns the number of seconds since epoch.
-	 * @return the number of seconds since epoch.
-	 */
-	double get_full_time();
-
-	/**
-	 * Sets FPU exceptions.
-	 */
-	void set_fpe_except();
+	return r;
+}
 
 	/** @} */
 
 #ifdef __cplusplus
 }
-#endif
-
-#ifdef __cplusplus
-
-#ifdef WIN32
-#ifndef ISINF
-#define ISINF
-#include <float.h>
-#define isnan _isnan
-inline bool isinf (double x)
-{
-	int c = _fpclass (x);
-	return (c == _FPCLASS_NINF || c == _FPCLASS_PINF);
-}
-#endif
-#endif
-
-/**
- * @ingroup misc
- * Timer class.
- */
-class Timer
-{
-	double t1_;
-
-public:
-	/**
-	 * Default constructor.
-	 */
-	Timer() : t1_ (get_full_time() ) {}
-
-	/**
-	 * @return the number of seconds from timer initialize or restart.
-	 */
-	double elapsed()
-	{
-		return (get_full_time() - t1_) / 100.0;
-	}
-
-	/**
-	 * Restart timer.
-	 */
-	void restart()
-	{
-		t1_ = get_full_time();
-	}
-};
-
 #endif
 
 #endif /* UTIL_H */

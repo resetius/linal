@@ -9,6 +9,11 @@ set(SOURCE
 	linal_util.h
 	util.cpp
 
+	timer.cpp
+	timer.h
+	fpe.cpp
+	fpe.h
+
 	gmres.h
 
 	impl/solver_impl.h

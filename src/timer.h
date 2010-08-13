@@ -1,7 +1,9 @@
+#ifndef LINAL_TIMER_H
+#define LINAL_TIMER_H
 /* -*- charset: utf-8 -*- */
 /*$Id$*/
 
-/* Copyright (c) 2009 Alexey Ozeritsky (РђР»РµРєСЃРµР№ РћР·РµСЂРёС†РєРёР№)
+/* Copyright (c) 2009-2010 Alexey Ozeritsky (Алексей Озерицкий)
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +29,56 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifdef _OPENMP
-#include <omp.h>
+#ifdef __cplusplus
+extern "C"
+{
 #endif
+/**
+ * @defgroup misc Miscellaneous functions and classes.
+ * @{
+ */
+/**
+ * Returns the number of seconds since epoch.
+ * @return the number of seconds since epoch.
+ */
+double get_full_time();
+
+/** @} */
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
+/**
+ * @ingroup misc
+ * Timer class.
+ */
+class Timer
+{
+	double t1_;
+
+public:
+	/**
+	 * Default constructor.
+	 */
+	Timer() : t1_ (get_full_time() ) {}
+
+	/**
+	 * @return the number of seconds from timer initialize or restart.
+	 */
+	double elapsed()
+	{
+		return (get_full_time() - t1_) / 100.0;
+	}
+
+	/**
+	 * Restart timer.
+	 */
+	void restart()
+	{
+		t1_ = get_full_time();
+	}
+};
+#endif
+
+#endif /* LINAL_TIMER_H */
