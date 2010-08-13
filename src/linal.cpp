@@ -265,44 +265,6 @@ void csr_add_matrix2 (const int * oAp, float * oAx,
 	csr_add_matrix2_ (oAp, oAx, Ap, Ai, Ax, x, n);
 }
 
-template < typename T >
-void ell_mult_vector_ (
-    T * r,
-    const int * Ai,
-    const T * Ax,
-    const T * x,
-    int n,
-    int cols,
-    int stride)
-{
-#pragma omp parallel for
-	for (int row = 0; row < n; ++row)
-	{
-		T sum = 0;
-		for (int i0 = 0; i0 < cols; i0++)
-		{
-			const T A_ij = Ax[stride * i0 + row];
-			const int col = Ai[stride * i0 + row];
-			sum += A_ij * x[col];
-		}
-		r[row] = sum;
-	}
-}
-
-void ell_mult_vector_r (double * r, const int * Ai,
-                        const double * Ax, const double * x,
-                        int n, int cols, int stride)
-{
-	ell_mult_vector_ (r, Ai, Ax, x, n, cols, stride);
-}
-
-void ell_mult_vector_r (float * r, const int * Ai,
-                        const float * Ax, const float * x,
-                        int n, int cols, int stride)
-{
-	ell_mult_vector_ (r, Ai, Ax, x, n, cols, stride);
-}
-
 int check_device_supports_double()
 {
 	return 1;
