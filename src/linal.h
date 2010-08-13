@@ -444,7 +444,7 @@ void set_num_threads (int threads);
 #include "mv_dense.h"
 #include "mv_csr.h"
 #include "mv_ell.h"
-#include "linal_util.h"
+#include "pow.h"
 #include "timer.h"
 #include "fpe.h"
 

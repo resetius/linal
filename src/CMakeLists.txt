@@ -6,9 +6,7 @@ set(SOURCE
 	linal_base.cpp
 	linal.h
 
-	linal_util.h
-	util.cpp
-
+	pow.h
 	timer.cpp
 	timer.h
 	fpe.cpp

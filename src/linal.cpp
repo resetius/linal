@@ -34,6 +34,10 @@
 #include <string.h>
 #include <float.h>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 namespace linal
 {
 
