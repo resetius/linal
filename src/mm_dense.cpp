@@ -1,59 +1,49 @@
-/*
- * Copyright 1993-2010 NVIDIA Corporation.  All rights reserved.
+/* -*- charset: utf-8 -*- */
+/*$Id$*/
+
+/* Copyright (c) 2009 Alexey Ozeritsky (Алексей Озерицкий)
+ * All rights reserved.
  *
- * NVIDIA Corporation and its licensors retain all intellectual property and 
- * proprietary rights in and to this software and related documentation. 
- * Any use, reproduction, disclosure, or distribution of this software 
- * and related documentation without an express license agreement from
- * NVIDIA Corporation is strictly prohibited.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission
  *
- * Please refer to the applicable NVIDIA end user license agreement (EULA) 
- * associated with this source code for terms and conditions that govern 
- * your use of this NVIDIA software.
- * 
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <string.h>
+
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 
-////////////////////////////////////////////////////////////////////////////////
-// export C interface
+#include "timer.h"
+
 extern "C"
-void computeGold( double*, const double*, const double*, unsigned int, unsigned int, unsigned int);
-
-////////////////////////////////////////////////////////////////////////////////
-//! Compute reference data set
-//! C = A * B
-//! @param C          reference data, computed but preallocated
-//! @param A          matrix A as provided to device
-//! @param B          matrix B as provided to device
-//! @param hA         height of matrix A
-//! @param wB         width of matrix B
-////////////////////////////////////////////////////////////////////////////////
 void
-computeGold(double* C, const double* A, const double* B, unsigned int hA, unsigned int wA, unsigned int wB)
+mat_mult_mat(double * C, const double * A, const double * B, int n)
 {
-	for (unsigned int i = 0; i < hA; ++i) {
-		for (unsigned int j = 0; j < wB; ++j) {
-			double sum = 0;
-			for (unsigned int k = 0; k < wA; ++k) {
-				double a = A[i * wA + k];
-				double b = B[k * wB + j];
-				sum += a * b;
-			}
-			C[i * wB + j] = sum;
-		}
-	}
-}
-
 #define block_dim 128
-static double As[block_dim][block_dim];
-static double Bs[block_dim][block_dim];
-static double Cs[block_dim][block_dim];
+	double As[block_dim][block_dim];
+	double Bs[block_dim][block_dim];
+	double Cs[block_dim][block_dim];
 
-extern "C"
-void
-computeGold2(double * C, const double * A, const double * B, int n)
-{
 	int blocks = (n + block_dim - 1) / block_dim;
 
 #pragma omp parallel
@@ -83,6 +73,12 @@ computeGold2(double * C, const double * A, const double * B, int n)
 
 			// C[l, m] = \sum A[l, k] * B[k, m]
 
+#pragma omp for schedule(static)
+			for (int i = 0; i < nll; ++i)
+			{
+				memcpy(&Cs[i][0], &C[(i + fl) * n + fm], nlm * sizeof(double));
+			}
+
 			for (int k = 0; k < blocks; ++k)
 			{
 				int fk = n * k;
@@ -94,19 +90,13 @@ computeGold2(double * C, const double * A, const double * B, int n)
 #pragma omp for schedule(static)
 				for (int i = 0; i < nll; ++i)
 				{
-					for (int j = 0; j < nlk; ++j)
-					{
-						As[i][j] = A[(i + fl) * n + (j + fk)];
-					}
+					memcpy(&As[i][0], &A[(i + fl) * n + fk], nlk * sizeof(double));
 				}
 
 #pragma omp for schedule(static)
 				for (int i = 0; i < nlm; ++i)
 				{
-					for (int j = 0; j < nlk; ++j)
-					{
-						Bs[i][j] = B[(i + fk) * n + (j + fm)];
-					}
+					memcpy(&Bs[i][0], &B[(i + fk) * n + fm], nlk * sizeof(double));
 				}
 
 #pragma omp barrier
@@ -121,100 +111,30 @@ computeGold2(double * C, const double * A, const double * B, int n)
 						{
 							s += As[i][k1] * Bs[k1][j];
 						}
-	//					Cs[i][j] = s;
-						C[(i + fl) * n + j + fm] += s;
+						Cs[i][j] += s;
 					}
 				}
 #pragma omp barrier
-				/*
+			}
+
 #pragma omp for schedule(static)
-				for (int i = 0; i < nll; ++i)
-				{
-					for (int j = 0; j < nlm; ++j)
-					{
-						C[(i + fl) * n + j + fm] += Cs[i][j];
-					}
-				}
-				*/
-
-#pragma omp barrier
-			}
-		}
-	}
-}
-
-}
-
-#include <time.h>
-
-#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-#define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
-#else
-#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
-#endif
-
-#ifdef _MSC_VER
-#include <windows.h>
-
-	struct timezone
-	{
-		int  tz_minuteswest; /* minutes W of Greenwich */
-		int  tz_dsttime;     /* type of dst correction */
-	};
-
-	int gettimeofday (struct timeval *tv, struct timezone *tz)
-	{
-		FILETIME ft;
-		unsigned __int64 tmpres = 0;
-		static int tzflag;
-
-		if (NULL != tv)
-		{
-			GetSystemTimeAsFileTime (&ft);
-
-			tmpres |= ft.dwHighDateTime;
-			tmpres <<= 32;
-			tmpres |= ft.dwLowDateTime;
-
-			/*converting file time to unix epoch*/
-			tmpres /= 10;  /*convert into microseconds*/
-			tmpres -= DELTA_EPOCH_IN_MICROSECS;
-			tv->tv_sec = (long) (tmpres / 1000000UL);
-			tv->tv_usec = (long) (tmpres % 1000000UL);
-		}
-
-		if (NULL != tz)
-		{
-			if (!tzflag)
+			for (int i = 0; i < nll; ++i)
 			{
-				_tzset();
-				tzflag++;
+				memcpy(&C[(i + fl) * n + fm], &Cs[i][0], nlm * sizeof(double));
 			}
-			tz->tz_minuteswest = _timezone / 60;
-			tz->tz_dsttime = _daylight;
+#pragma omp barrier
 		}
-
-		return 0;
 	}
-#else
-#include <sys/time.h>
-#endif
+}
 
-extern "C"
-	double get_full_time()
-	{
-		struct timeval tv;
-		gettimeofday (&tv, 0);
-		return (double) (tv.tv_sec * 100.0 + tv.tv_usec / 10000.0);
-	}
-
+}
 
 #ifdef TEST
 #include <vector>
 #include <stdio.h>
 
 using namespace std;
-#define N 4096L
+#define N 2048L
 
 int main()
 {
@@ -222,9 +142,8 @@ int main()
 	vector < double > B(N * N);
 	vector < double > C(N * N);
 	double t  = get_full_time();
-	omp_set_num_threads(4);
-	computeGold2(&C[0], &A[0], &B[0], N);
+	//omp_set_num_threads(4);
+	mat_mult_mat(&C[0], &A[0], &B[0], N);
 	printf("%lf\n", (get_full_time() - t) / 100.0);
 }
 #endif
-
