@@ -159,42 +159,6 @@ void mat_transpose (double * out, const double * in, int n, int m);
 void mat_transpose1 (double * out, const double * in, double k, int n, int m);
 
 /**
- * Product of NxN matrix and vector
- * @param r - output vector, r = Ax
- * @param A - intput matrix
- * @param x - input vector
- * @param n - dimension of matrix and vector
- */
-void mat_mult_vector (double * r, const double * A, const double * x, int n);
-
-/**
- * Product of NxN matrix and vector
- * @param r - output vector, r = Ax
- * @param A - intput matrix
- * @param x - input vector
- * @param n - dimension of matrix and vector
- */
-void mat_mult_vector (float * r, const float * A, const float * x, int n);
-
-/**
- * Product of NxN matrix and vector (stupid algorithm)
- * @param r - output vector, r = Ax
- * @param A - intput matrix
- * @param x - input vector
- * @param n - dimension of matrix and vector
- */
-void mat_mult_vector_stupid (double * r, const double * A, const double * x, int n);
-
-/**
- * Product of NxN matrix and vector (stupid algorithm)
- * @param r - output vector, r = Ax
- * @param A - intput matrix
- * @param x - input vector
- * @param n - dimension of matrix and vector
- */
-void mat_mult_vector_stupid (float * r, const float * A, const float * x, int n);
-
-/**
  * CSR matrix multiplication: r = A x
  * @param r - output vector
  * @param Ap -
@@ -506,6 +470,8 @@ void set_num_threads (int threads);
 
 } /* namespace */
 
+#include "mm_dense.h"
 #include "linal_util.h"
 
 #endif /* PHELM_LA_H */
+

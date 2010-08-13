@@ -44,24 +44,24 @@ namespace linal
 {
 
 double vec_find_min (const double * v, int n)
-        {
-                double mn = v[0];
-                for (int i = 0; i < n; ++i)
-                {
-                        if (v[i] < mn) mn = v[i];
-                }
-                return mn;
-        }
+{
+	double mn = v[0];
+	for (int i = 0; i < n; ++i)
+	{
+		if (v[i] < mn) mn = v[i];
+	}
+	return mn;
+}
 
-        double vec_find_max (const double * v, int n)
-        {
-                double mx = v[0];
-                for (int i = 0; i < n; ++i)
-                {
-                        if (v[i] > mx) mx = v[i];
-                }
-                return mx;
-        }
+double vec_find_max (const double * v, int n)
+{
+	double mx = v[0];
+	for (int i = 0; i < n; ++i)
+	{
+		if (v[i] > mx) mx = v[i];
+	}
+	return mx;
+}
 
 void set_num_threads (int threads)
 {
@@ -276,83 +276,6 @@ void vec_print (const char * fn, const float * A, int n, const char * fmt)
 	if (!f) return;
 	vec_print_ (f, A, n, fmt);
 	fclose (f);
-}
-
-template < typename T >
-void mat_mult_vector_ (T * r, const T * A, const T * x, int n)
-{
-#pragma omp parallel
-	{
-		int procs  = get_num_threads();
-		int blocks = procs;
-		int id     = get_my_id();
-		int f_row  = n * id;
-		f_row /= procs;
-		int l_row  = n * (id + 1);
-		l_row = l_row / procs - 1;
-		int m = id;
-
-		for (int i = f_row; i <= l_row; ++i)
-		{
-			r[i] = 0;
-		}
-
-		for (int block = 0; block < blocks; ++block, m = (m + 1) % blocks)
-		{
-			int fm = n * m;
-			fm /= blocks;
-			int lm = n * (m + 1);
-			lm = lm / blocks - 1;
-
-			for (int i = f_row; i <= l_row; ++i)
-			{
-				T s = 0.0;
-				const T * ax = &A[i * n + fm];
-				const T * xx = &x[fm];
-
-				for (int j = fm; j <= lm; ++j)
-				{
-					s += *ax++ * *xx++;
-				}
-				r[i] += s;
-			}
-		}
-	}
-}
-
-void mat_mult_vector (double * r, const double * A, const double * x, int n)
-{
-	mat_mult_vector_ (r, A, x, n);
-}
-
-void mat_mult_vector (float * r, const float * A, const float * x, int n)
-{
-	mat_mult_vector_ (r, A, x, n);
-}
-
-template < typename T >
-void mat_mult_vector_stupid_ (T * r, const T * A, const T * x, int n)
-{
-#pragma omp parallel for
-	for (int i = 0; i < n; ++i)
-	{
-		T s = 0.0;
-		for (int j = 0; j < n; ++j)
-		{
-			s += A[i * n + j] * x[j];
-		}
-		r[i] = s;
-	}
-}
-
-void mat_mult_vector_stupid (double * r, const double * A, const double * x, int n)
-{
-	mat_mult_vector_stupid_ (r, A, x, n);
-}
-
-void mat_mult_vector_stupid (float * r, const float * A, const float * x, int n)
-{
-	mat_mult_vector_stupid_ (r, A, x, n);
 }
 
 template < typename T >

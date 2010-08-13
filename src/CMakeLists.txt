@@ -6,6 +6,9 @@ set(SOURCE
 	linal_base.cpp
 	linal.h
 
+	mm_dense.cpp
+	mm_dense.h
+
 	linal_util.h
 	util.cpp
 
