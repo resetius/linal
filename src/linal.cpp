@@ -199,41 +199,6 @@ float vec_scalar2 (const float * a, const float * b, int n)
 }
 
 template < typename T >
-void csr_mult_vector_ (T * r, const int * Ap, const int * Ai,
-                       const T * Ax, const T * x, int n)
-{
-	int j;
-
-#pragma omp parallel for
-	for (j = 0; j < n; ++j)
-	{
-		const T *p = &Ax[Ap[j]];
-		T rj = (T) 0.0;
-		int i0;
-
-		for (i0 = Ap[j]; i0 < Ap[j + 1]; ++i0, ++p)
-		{
-			int i = Ai[i0];
-			rj += *p * x[i];
-		}
-
-		r[j] = rj;
-	}
-}
-
-void csr_mult_vector_r (double * r, const int * Ap, const int * Ai,
-                        const double * Ax, const double * x, int n, int nz)
-{
-	csr_mult_vector_ (r, Ap, Ai, Ax, x, n);
-}
-
-void csr_mult_vector_r (float * r, const int * Ap, const int * Ai,
-                        const float * Ax, const float * x, int n, int nz)
-{
-	csr_mult_vector_ (r, Ap, Ai, Ax, x, n);
-}
-
-template < typename T >
 void csr_add_matrix1_ (const int * oAp, T * oAx,
                        const int * Ap, const int * Ai, const T * Ax,
                        const T * x, int n)

@@ -6,9 +6,6 @@ set(SOURCE
 	linal_base.cpp
 	linal.h
 
-	mm_dense.cpp
-	mm_dense.h
-
 	linal_util.h
 	util.cpp
 
@@ -24,6 +21,10 @@ set(SOURCE
 add_library(linal
 	${SOURCE}
 	linal.cpp
+	mm_dense.cpp
+	mm_dense.h
+	mm_csr.cpp
+	mm_csr.h
 	)
 
 if (CUDA_FOUND)

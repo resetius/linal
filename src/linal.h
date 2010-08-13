@@ -159,20 +159,6 @@ void mat_transpose (double * out, const double * in, int n, int m);
 void mat_transpose1 (double * out, const double * in, double k, int n, int m);
 
 /**
- * CSR matrix multiplication: r = A x
- * @param r - output vector
- * @param Ap -
- * @param Ai -
- * @param Ax -
- * @param x - input vector
- * @param n - the size of vector and matrix
- */
-void csr_mult_vector_r (double * r, const int * Ap, const int * Ai,
-                        const double * Ax, const double * x, int n, int nz);
-void csr_mult_vector_r (float * r, const int * Ap, const int * Ai,
-                        const float * Ax, const float * x, int n, int nz);
-
-/**
  * @param n - число строк в матрице Ax
  */
 void csr_add_matrix1 (const int * oAp, double * oAx,
@@ -471,6 +457,7 @@ void set_num_threads (int threads);
 } /* namespace */
 
 #include "mm_dense.h"
+#include "mm_csr.h"
 #include "linal_util.h"
 
 #endif /* PHELM_LA_H */
