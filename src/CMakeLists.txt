@@ -25,6 +25,8 @@ add_library(linal
 	mm_dense.h
 	mm_csr.cpp
 	mm_csr.h
+	mm_ell.cpp
+	mm_ell.h
 	)
 
 if (CUDA_FOUND)

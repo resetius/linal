@@ -1,5 +1,3 @@
-#ifndef MM_CSR_H
-#define MM_CSR_H
 /* -*- charset: utf-8 -*- */
 /*$Id$*/
 
@@ -29,33 +27,53 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <math.h>
+#include <stdio.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <string.h>
+#include <float.h>
+
 namespace linal
 {
 
-/**
- * @defgroup la Linear Algebra functions and Classes.
- * @{
- */
+template < typename T >
+void ell_mult_vector_ (
+    T * r,
+    const int * Ai,
+    const T * Ax,
+    const T * x,
+    int n,
+    int cols,
+    int stride)
+{
+#pragma omp parallel for
+	for (int row = 0; row < n; ++row)
+	{
+		T sum = 0;
+		for (int i0 = 0; i0 < cols; i0++)
+		{
+			const T A_ij = Ax[stride * i0 + row];
+			const int col = Ai[stride * i0 + row];
+			sum += A_ij * x[col];
+		}
+		r[row] = sum;
+	}
+}
 
-/**
- * CSR matrix multiplication: r = A x
- * @param r - output vector
- * @param Ap -
- * @param Ai -
- * @param Ax -
- * @param x - input vector
- * @param n - the size of vector and matrix
- */
+void ell_mult_vector_r (double * r, const int * Ai,
+                        const double * Ax, const double * x,
+                        int n, int cols, int stride)
+{
+	ell_mult_vector_ (r, Ai, Ax, x, n, cols, stride);
+}
 
-void csr_mult_vector_r (double * r, const int * Ap, const int * Ai,
-                        const double * Ax, const double * x, int n, int nz);
+void ell_mult_vector_r (float * r, const int * Ai,
+                        const float * Ax, const float * x,
+                        int n, int cols, int stride)
+{
+	ell_mult_vector_ (r, Ai, Ax, x, n, cols, stride);
+}
 
-void csr_mult_vector_r (float * r, const int * Ap, const int * Ai,
-                        const float * Ax, const float * x, int n, int nz);
-/**
- * @}
- */
 } /* namespace linal */
-
-#endif // MM_CSR_H
 
