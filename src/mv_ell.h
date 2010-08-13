@@ -1,5 +1,5 @@
-#ifndef MM_CSR_H
-#define MM_CSR_H
+#ifndef MV_ELL_H
+#define MV_ELL_H
 /* -*- charset: utf-8 -*- */
 /*$Id$*/
 
@@ -38,24 +38,25 @@ namespace linal
  */
 
 /**
- * CSR matrix multiplication: r = A x
+ * ELL matrix multiplication: r = A x
  * @param r - output vector
- * @param Ap -
  * @param Ai -
  * @param Ax -
  * @param x - input vector
  * @param n - the size of vector and matrix
  */
+void ell_mult_vector_r (double * r, const int * Ai,
+                        const double * Ax, const double * x,
+                        int n, int cols, int stride);
 
-void csr_mult_vector_r (double * r, const int * Ap, const int * Ai,
-                        const double * Ax, const double * x, int n, int nz);
+void ell_mult_vector_r (float * r, const int * Ai,
+                        const float * Ax, const float * x,
+                        int n, int cols, int stride);
 
-void csr_mult_vector_r (float * r, const int * Ap, const int * Ai,
-                        const float * Ax, const float * x, int n, int nz);
 /**
  * @}
  */
-} /* namespace linal */
 
-#endif // MM_CSR_H
+} /* namespace linal */
+#endif // MV_ELL_H
 

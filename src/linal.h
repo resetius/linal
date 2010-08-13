@@ -456,9 +456,9 @@ void set_num_threads (int threads);
 
 } /* namespace */
 
-#include "mm_dense.h"
-#include "mm_csr.h"
-#include "mm_ell.h"
+#include "mv_dense.h"
+#include "mv_csr.h"
+#include "mv_ell.h"
 #include "linal_util.h"
 
 #endif /* PHELM_LA_H */

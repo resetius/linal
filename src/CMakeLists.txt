@@ -21,12 +21,12 @@ set(SOURCE
 add_library(linal
 	${SOURCE}
 	linal.cpp
-	mm_dense.cpp
-	mm_dense.h
-	mm_csr.cpp
-	mm_csr.h
-	mm_ell.cpp
-	mm_ell.h
+	mv_dense.cpp
+	mv_dense.h
+	mv_csr.cpp
+	mv_csr.h
+	mv_ell.cpp
+	mv_ell.h
 	)
 
 if (CUDA_FOUND)

@@ -38,8 +38,6 @@
 #include <omp.h>
 #endif
 
-#include "mm_dense.h"
-
 namespace linal
 {
 

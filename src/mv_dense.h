@@ -1,9 +1,12 @@
-#ifndef MM_ELL_H
-#define MM_ELL_H
+#ifndef MV_DENSE_H
+#define MV_DENSE_H
 /* -*- charset: utf-8 -*- */
 /*$Id$*/
-
-/* Copyright (c) 2009-2010 Alexey Ozeritsky
+/**
+ * @file
+ * @author Alexey Ozeritsky <aozeritsky@gmail.com>
+ *
+ * Copyright (c) 2009-2010 Alexey Ozeritsky
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -16,7 +19,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission
- *
+ 
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -38,25 +41,46 @@ namespace linal
  */
 
 /**
- * ELL matrix multiplication: r = A x
- * @param r - output vector
- * @param Ai -
- * @param Ax -
+ * Product of NxN matrix and vector
+ * @param r - output vector, r = Ax
+ * @param A - intput matrix
  * @param x - input vector
- * @param n - the size of vector and matrix
+ * @param n - dimension of matrix and vector
  */
-void ell_mult_vector_r (double * r, const int * Ai,
-                        const double * Ax, const double * x,
-                        int n, int cols, int stride);
+void mat_mult_vector (double * r, const double * A, const double * x, int n);
 
-void ell_mult_vector_r (float * r, const int * Ai,
-                        const float * Ax, const float * x,
-                        int n, int cols, int stride);
+/**
+ * Product of NxN matrix and vector
+ * @param r - output vector, r = Ax
+ * @param A - intput matrix
+ * @param x - input vector
+ * @param n - dimension of matrix and vector
+ */
+void mat_mult_vector (float * r, const float * A, const float * x, int n);
+
+/**
+ * Product of NxN matrix and vector (stupid algorithm)
+ * @param r - output vector, r = Ax
+ * @param A - intput matrix
+ * @param x - input vector
+ * @param n - dimension of matrix and vector
+ */
+void mat_mult_vector_stupid (double * r, const double * A, const double * x, int n);
+
+/**
+ * Product of NxN matrix and vector (stupid algorithm)
+ * @param r - output vector, r = Ax
+ * @param A - intput matrix
+ * @param x - input vector
+ * @param n - dimension of matrix and vector
+ */
+void mat_mult_vector_stupid (float * r, const float * A, const float * x, int n);
 
 /**
  * @}
  */
 
-} /* namespace linal */
-#endif // MM_ELL_H
+} /* namespace */
+
+#endif /* MV_DENSE_H */
 

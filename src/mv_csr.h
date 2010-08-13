@@ -1,12 +1,9 @@
-#ifndef PHELM_LA_H
-#define PHELM_LA_H
+#ifndef MV_CSR_H
+#define MV_CSR_H
 /* -*- charset: utf-8 -*- */
 /*$Id$*/
-/**
- * @file
- * @author Alexey Ozeritsky <aozeritsky@gmail.com>
- *
- * Copyright (c) 2009-2010 Alexey Ozeritsky
+
+/* Copyright (c) 2009-2010 Alexey Ozeritsky
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -19,7 +16,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission
- 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -41,46 +38,24 @@ namespace linal
  */
 
 /**
- * Product of NxN matrix and vector
- * @param r - output vector, r = Ax
- * @param A - intput matrix
+ * CSR matrix multiplication: r = A x
+ * @param r - output vector
+ * @param Ap -
+ * @param Ai -
+ * @param Ax -
  * @param x - input vector
- * @param n - dimension of matrix and vector
+ * @param n - the size of vector and matrix
  */
-void mat_mult_vector (double * r, const double * A, const double * x, int n);
 
-/**
- * Product of NxN matrix and vector
- * @param r - output vector, r = Ax
- * @param A - intput matrix
- * @param x - input vector
- * @param n - dimension of matrix and vector
- */
-void mat_mult_vector (float * r, const float * A, const float * x, int n);
+void csr_mult_vector_r (double * r, const int * Ap, const int * Ai,
+                        const double * Ax, const double * x, int n, int nz);
 
-/**
- * Product of NxN matrix and vector (stupid algorithm)
- * @param r - output vector, r = Ax
- * @param A - intput matrix
- * @param x - input vector
- * @param n - dimension of matrix and vector
- */
-void mat_mult_vector_stupid (double * r, const double * A, const double * x, int n);
-
-/**
- * Product of NxN matrix and vector (stupid algorithm)
- * @param r - output vector, r = Ax
- * @param A - intput matrix
- * @param x - input vector
- * @param n - dimension of matrix and vector
- */
-void mat_mult_vector_stupid (float * r, const float * A, const float * x, int n);
-
+void csr_mult_vector_r (float * r, const int * Ap, const int * Ai,
+                        const float * Ax, const float * x, int n, int nz);
 /**
  * @}
  */
+} /* namespace linal */
 
-} /* namespace */
-
-#endif /* PHELM_LA_H */
+#endif // MV_CSR_H
 
