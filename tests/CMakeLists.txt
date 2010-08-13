@@ -12,6 +12,8 @@ add_executable(la_test_mm_dense ../src/mm_dense.cpp ../src/timer.cpp)
 
 if (OPENMP_FOUND)
 	set_target_properties(la_test_solver PROPERTIES LINK_FLAGS ${OpenMP_C_FLAGS})
+	set_target_properties(la_test_lu PROPERTIES LINK_FLAGS ${OpenMP_C_FLAGS})
+	set_target_properties(la_test_mm_dense PROPERTIES LINK_FLAGS ${OpenMP_C_FLAGS})
 endif (OPENMP_FOUND)
 
 if (CUDA_FOUND)
