@@ -66,147 +66,15 @@ void vector_splay (int n, int threads_min, int threads_max,
 	}
 }
 
-register_texture(float, texX1);
+//register_texture(float, texX1);
 register_texture(float, texAX);
-register_texture(int, texAP);
-register_texture(int, texAI);
+//register_texture(int, texAP);
+//register_texture(int, texAI);
 
 register_texture(float, texA);
 register_texture(float, texB);
 
 namespace linal {
-
-template < typename T, typename APR, typename AIR, typename XR, typename AXR >
-__global__ void sparse_mult_vector_csr_(T * r, 
-	APR Ap, 
-	AIR Ai, 
-	AXR Ax,
-	XR x, 
-	int n)
-{
-	int threads = gridDim.x  * blockDim.x;
-	int i, i0, to, j;
-	int start = blockDim.x * blockIdx.x + threadIdx.x;
-
-	for (j = start; j < n; j += threads) {
-		i0 = Ap.get(j);    
-		to = Ap.get(j + 1);
-
-		T rj = (T)0.0;
-
-		for (; i0 < to; ++i0) {
-			i   = Ai.get(i0);
-			rj += Ax.get(i0) * x.get(i);
-		}
-
-		r[j] = rj;
-	}
-}
-
-__host__ void csr_mult_vector_r(double * r, 
-	const int * Ap, 
-	const int * Ai, 
-	const double * Ax,
-	const double * x, 
-	int n,
-	int nz)
-{
-	SPLAY(n);
-	simple_reader < double > XR(x);
-	simple_reader < double > AXR(Ax);
-	simple_reader < int > AIR(Ap);
-	simple_reader < int > APR(Ap);
-
-	sparse_mult_vector_csr_ <<< blocks, threads >>> (r, APR, AIR, AXR, XR, n);
-}
-
-__host__ void csr_mult_vector_r(float * r, 
-	const int * Ap, 
-	const int * Ai, 
-	const float * Ax,
-	const float * x, 
-	int n,
-	int nz)
-{
-	SPLAY(n);
-
-	bool useTexture;
-
-	useTexture = ((n + 1 < MAX_1DBUF_SIZE) && (nz < MAX_1DBUF_SIZE));
-
-	if (n < 1000) /* experimental bound */
-	{
-		useTexture = false;
-	}
-
-	if (useTexture) {
-		texture_reader(texX1) XR(x, n);
-		texture_reader(texAX) AXR(Ax, nz);
-		texture_reader(texAI) AIR(Ai, nz);
-		texture_reader(texAP) APR(Ap, n + 1);
-
-		sparse_mult_vector_csr_ <<< blocks, threads >>> (r, APR, AIR, AXR, XR, n);
-	} else {
-		simple_reader < float > XR(x);
-		simple_reader < float > AXR(Ax);
-		simple_reader < int > AIR(Ai);
-		simple_reader < int > APR(Ap);
-
-		sparse_mult_vector_csr_ <<< blocks, threads >>> (r, APR, AIR, AXR, XR, n);
-	}
-}
-
-template < typename T, typename AIR, typename AXR, typename XR >
-__global__ void ell_mult(
-			   T * r, 
-			   AIR Ai, 
-			   AXR Ax,
-			   XR x, 
-			   int n,
-			   int cols, 
-			   int stride)
-{
-	int row = blockDim.x * blockIdx.x + threadIdx.x;
-	if (row < n) {
-		T sum = 0;
-
-		for (int i0 = 0; i0 < cols; i0++){
-			const T A_ij = Ax.get(stride * i0 + row);
-
-			if (A_ij != 0) {
-				const int col = Ai.get(stride * i0 + row);
-				sum += A_ij * x.get(col);
-			}
-		}
-	    r[row] = sum;
-	}
-}
-
-__host__ void 
-ell_mult_vector_r(float * r, const int * Ai, const float * Ax, 
-	const float * x, int n, int cols, int stride)
-{
-	SPLAY2(n);
-
-	texture_reader(texX1) XR(x, n);
-	texture_reader(texAX) AXR(Ax, cols * stride);
-	texture_reader(texAI) AIR(Ai, cols * stride);
-	
-	ell_mult<<<blocks, threads>>>(r, AIR, AXR, XR, n, cols, stride);
-}
-
-__host__ void 
-ell_mult_vector_r(double * r, const int * Ai, const double * Ax, 
-	const double * x, int n, int cols, int stride)
-{
-	SPLAY2(n);
-
-	simple_reader < double > XR(x);
-	simple_reader < double > AXR(Ax);
-	simple_reader < int > AIR(Ai);
-	
-	ell_mult<<<blocks, threads>>>(r, AIR, AXR, XR, n, cols, stride);
-}
 
 /* r = k1 * a + k2 * b */
 template < typename T >

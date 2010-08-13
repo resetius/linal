@@ -1,6 +1,3 @@
-#ifndef TEXTURE_H
-#define TEXTURE_H
-
 /* -*- charset: utf-8 -*- */
 /*$Id$*/
 
@@ -30,52 +27,67 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdexcept>
+#include "linal_cuda.h"
+#include "texture.h"
 
-#define register_texture(type, name) \
-	static texture < type > tex_##name; \
-	struct reader_tex_##name \
-	{ \
-		size_t off; \
-		type * ptr; \
-		int size; \
-		reader_tex_##name (const type * p, int n): ptr((type*)p), size(n)  \
-		{ \
-			bind(); \
-		} \
-		void bind() \
-		{ \
-			if (cudaBindTexture(&off, tex_##name, ptr, size * sizeof(ptr[0])) != cudaSuccess) { \
-				throw std::runtime_error("cannot bind texture \n"); \
-			} \
-			off /= sizeof(ptr[0]); \
-		} \
-		void unbind() \
-		{ \
-			if (cudaUnbindTexture(tex_##name) !=  cudaSuccess) \
-			{ \
-				throw std::runtime_error("cannot unbind texture \n"); \
-			} \
-		} \
-		__device__ type get (size_t i) \
-			{ return tex1Dfetch(tex_##name, off + i); } \
-	};
+register_texture(float, texX1);
+register_texture(float, texAX);
+register_texture(int, texAP);
+register_texture(int, texAI);
 
-#define texture_reader(name) \
-	reader_tex_##name
+namespace linal {
 
-template < typename T >
-struct simple_reader
+template < typename T, typename AIR, typename AXR, typename XR >
+__global__ void ell_mult(
+			   T * r, 
+			   AIR Ai, 
+			   AXR Ax,
+			   XR x, 
+			   int n,
+			   int cols, 
+			   int stride)
 {
-	const T * ptr;
-	size_t off;
-	simple_reader(const T * p): ptr(p), off(0) {}
-	__device__ T get(size_t i) { return ptr[i]; }
-};
+	int row = blockDim.x * blockIdx.x + threadIdx.x;
+	if (row < n) {
+		T sum = 0;
 
-#define WORD_ALIGN     (64)   /* alignment for 32-bit word */
-#define LONG_ALIGN     (128)  /* alignment for 64-bit long */
-#define _1DBUF_ALIGN   (256)  /* alignment for 1D buffer */
-#define MAX_1DBUF_SIZE ((1<<27)-_1DBUF_ALIGN)
+		for (int i0 = 0; i0 < cols; i0++){
+			const T A_ij = Ax.get(stride * i0 + row);
 
-#endif /* TEXTURE_H */
+			if (A_ij != 0) {
+				const int col = Ai.get(stride * i0 + row);
+				sum += A_ij * x.get(col);
+			}
+		}
+	    r[row] = sum;
+	}
+}
+
+__host__ void 
+ell_mult_vector_r(float * r, const int * Ai, const float * Ax, 
+	const float * x, int n, int cols, int stride)
+{
+	SPLAY2(n);
+
+	texture_reader(texX1) XR(x, n);
+	texture_reader(texAX) AXR(Ax, cols * stride);
+	texture_reader(texAI) AIR(Ai, cols * stride);
+	
+	ell_mult<<<blocks, threads>>>(r, AIR, AXR, XR, n, cols, stride);
+}
+
+__host__ void 
+ell_mult_vector_r(double * r, const int * Ai, const double * Ax, 
+	const double * x, int n, int cols, int stride)
+{
+	SPLAY2(n);
+
+	simple_reader < double > XR(x);
+	simple_reader < double > AXR(Ax);
+	simple_reader < int > AIR(Ai);
+	
+	ell_mult<<<blocks, threads>>>(r, AIR, AXR, XR, n, cols, stride);
+}
+
+}
+

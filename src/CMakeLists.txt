@@ -36,6 +36,8 @@ if (CUDA_FOUND)
 		gpu/linal_cuda.h
 		gpu/alloc_cu.h
 		gpu/linal.cu
+		gpu/mv_csr.cu
+		gpu/mv_ell.cu
 		gpu/texture.h
 		gpu/shmem.h
 		gpu/reduction.h
