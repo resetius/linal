@@ -304,28 +304,38 @@ mat_mult_mat1(double * C, const double * A, const double * B, int n)
 
 				for (int i = 0; i < nlm; ++i)
 				{
+					memcpy(&Bs[i][0], &B[(i + fk) * n + fm], nlk * sizeof(double));
+					/*
 					for (int j = 0; j < nlk; ++j)
 					{
 						Bs[i][j] = B[(i + fk) * n + (j + fm)];
 					}
+					*/
 				}
 
 				for (int i = 0; i < nll; ++i)
 				{
+					memcpy(&As[i][0], &A[(i + fl) * n + fk], nlk * sizeof(double));
+					/*
 					for (int j = 0; j < nlk; ++j)
 					{
 						As[i][j] = A[(i + fl) * n + (j + fk)];
-					}
+					}*/
 				}
 
 				for (int i = 0; i < nll; ++i)
 				{
+					double * pa = &As[i][0];
 					for (int k1 = 0; k1 < nlm; ++k1)
 					{
+						double * pc = &C[(i + fl) * n + fm];
+						double * pb = &Bs[k1][0];
 						for (int j = 0; j < nlm; ++j)
 						{
-							C[(i + fl) * n + j + fm] += As[i][k1] * Bs[k1][j];
+							*pc++ += *pa * *pb++;
 						}
+
+						++pa;
 					}
 				}
 			}
