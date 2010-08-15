@@ -323,13 +323,16 @@ mat_mult_mat1(double * C, const double * A, const double * B, int n)
 					}*/
 				}
 
+				double * pa = &As[0][0];
+
 				for (int i = 0; i < nll; ++i)
 				{
-					double * pa = &As[i][0];
+					double * pb = &Bs[0][0];
+
 					for (int k1 = 0; k1 < nlm; ++k1)
 					{
 						double * pc = &C[(i + fl) * n + fm];
-						double * pb = &Bs[k1][0];
+
 						for (int j = 0; j < nlm; ++j)
 						{
 							*pc++ += *pa * *pb++;
