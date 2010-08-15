@@ -57,12 +57,13 @@ mat_mult_mat_stupid(double * C, const double * A, const double * B, int n)
 void
 mat_mult_mat(double * C, const double * A, const double * B, int n)
 {
-#define block_dim 128
+#define block_dim 64
 	double As[block_dim][block_dim];
 	double Bs[block_dim][block_dim];
 	double Cs[block_dim][block_dim];
 
 	int blocks = (n + block_dim - 1) / block_dim;
+#undef block_dim
 
 #pragma omp parallel
 {
@@ -149,6 +150,195 @@ mat_mult_mat(double * C, const double * A, const double * B, int n)
 
 }
 
+static int get_num_threads ()
+{
+#ifdef _OPENMP
+	return omp_get_num_threads();
+#else
+	return 1;
+#endif
+}
+
+static int get_my_id ()
+{
+#ifdef _OPENMP
+	return omp_get_thread_num();
+#else
+	return 1;
+#endif
+}
+
+void
+mat_mult_mat_cannon(double * C, const double * A, const double * B, int n)
+{
+#define block_dim 64
+#pragma omp parallel
+{
+	int blocks = (n + block_dim - 1) / block_dim;
+	int id = get_my_id();
+	int threads = get_num_threads();
+
+	int first_row = n * id;
+	first_row /= threads;
+	int last_row = n * (id + 1);
+	last_row = last_row / threads - 1;
+
+#pragma omp for
+	for (int i = 0; i < n * n; ++i) {
+		C[i] = 0.0;
+	}
+
+//	for (int l = 0; l < threads; ++l) {
+//		int k = (id + l) % threads;
+//		int fk = n * k;
+//		fk /= threads;
+//		int lk = n * (k + 1);
+//		lk = lk / threads - 1;
+//		int nlk = lk - fk + 1;
+
+	for (int l = 0; l < blocks; ++l) {
+		int k = (id + l) % blocks;
+		int fk = n * k;
+		fk /= blocks;
+		int lk = n * (k + 1);
+		lk = lk / blocks - 1;
+		int nlk = lk - fk + 1;
+
+		for (int c_col = 0; c_col < n; c_col += block_dim)
+		{
+			int c_ncol = (c_col + block_dim <= n ? c_col + block_dim : n) - 1;
+
+			for (int c_row = first_row; c_row <= last_row; c_row += block_dim)
+			{
+				int c_nrow = (c_row + block_dim - 1 <= last_row 
+					? c_row + block_dim - 1 : last_row);
+
+				for (int a_col = fk; a_col <= lk; a_col += block_dim)
+				{
+					int a_ncol = (a_col + block_dim - 1 <= lk 
+						? a_col + block_dim - 1 : lk);
+
+					int m = c_col;
+					const double * pb = B + m;
+					double * pc = C + m;
+
+					for (; m <= c_ncol; m += 2, pb += 2, pc += 2)
+					{
+						for (int i = c_row; i <= c_nrow; i += 2)
+						{
+							double s00, s01, s10, s11;
+							s00 = s01 = s10 = s11 = 0.0;
+
+							int j = a_col;
+							const double * pa = A + i * n + j;
+							for (; j <= a_ncol; ++j, ++pa)
+							{
+								s00 += pa[0] * pb[j * n];
+								s01 += pa[0] * pb[j * n + 1];
+								s10 += pa[n] * pb[j * n];
+								s11 += pa[n] * pb[j * n + 1];
+							}
+
+							pc[i * n]           += s00;
+							pc[i * n + 1]       += s01;
+							pc[(i + 1) * n]     += s10;
+							pc[(i + 1) * n + 1] += s11;
+						}
+					}
+				}
+			}
+		}
+
+#pragma omp barrier
+	}
+
+}
+#undef block_dim
+}
+
+void
+mat_mult_mat1(double * C, const double * A, const double * B, int n)
+{
+#define block_dim 64
+	int blocks = (n + block_dim - 1) / block_dim;
+
+#pragma omp parallel
+{
+	double As[block_dim][block_dim];
+	double Bs[block_dim][block_dim];
+	double Cs[block_dim][block_dim];
+
+	int id  = get_my_id();
+	int num = get_num_threads();
+
+#pragma omp for
+	for (int i = 0; i < n * n; ++i)
+	{
+		C[i] = 0;
+	}
+
+	for (int l = id; l < blocks; l += num )
+	{
+		int fl = n * l;
+		fl /= blocks;
+		int ll = n * (l + 1);
+		ll = ll / blocks - 1;
+		int nll = ll - fl + 1;
+
+		for (int m = 0; m < blocks; ++m)
+		{
+			int fm = n * m;
+			fm /= blocks;
+			int lm = n * (m + 1);
+			lm = lm / blocks - 1;
+			int nlm = lm - fm + 1;
+
+			// C[l, m] = \sum A[l, k] * B[k, m]
+			for (int k = 0; k < blocks; ++k)
+			{
+				int fk = n * k;
+				fk /= blocks;
+				int lk = n * (k + 1);
+				lk = lk / blocks - 1;
+				int nlk = lk - fk + 1;
+
+				for (int i = 0; i < nlm; ++i)
+				{
+					for (int j = 0; j < nlk; ++j)
+					{
+						Bs[i][j] = B[(i + fk) * n + (j + fm)];
+					}
+				}
+
+				for (int i = 0; i < nll; ++i)
+				{
+					for (int j = 0; j < nlk; ++j)
+					{
+						As[i][j] = A[(i + fl) * n + (j + fk)];
+					}
+				}
+
+				for (int i = 0; i < nll; ++i)
+				{
+					for (int j = 0; j < nlm; ++j)
+					{
+						double s = 0.0;
+						for (int k1 = 0; k1 < nlm; ++k1)
+						{
+							s += As[i][k1] * Bs[k1][j];
+						}
+						C[(i + fl) * n + j + fm] += s;
+					}
+				}
+			}
+
+#pragma omp barrier
+		}
+	}
+}
+#undef block_dim
+}
+
 #ifdef TEST
 #include <vector>
 #include <stdio.h>
@@ -156,7 +346,8 @@ mat_mult_mat(double * C, const double * A, const double * B, int n)
 using namespace std;
 using namespace linal;
 
-#define N 2048L
+#define N 1024L
+#define CHECK
 
 int main()
 {
@@ -181,14 +372,17 @@ int main()
 	double t, seconds;
 	t = get_full_time();
 	//omp_set_num_threads(4);
-	mat_mult_mat(&C[0], &A[0], &B[0], n);
+	//mat_mult_mat(&C[0], &A[0], &B[0], n);
+	mat_mult_mat_cannon(&C[0], &A[0], &B[0], n);
+	//mat_mult_mat1(&C[0], &A[0], &B[0], n);
+
 	seconds = (get_full_time() - t) / 100.0;
 	printf("t=%lf, gflops=%lf\n", seconds, 
 		1e-9 * 2.0 * (double)n * (double)n * (double)n / seconds);
 
 	// check
 
-#if 0
+#ifdef CHECK
 	t = get_full_time();
 	mat_mult_mat_stupid(&reference[0], &A[0], &B[0], n);
 	seconds = (get_full_time() - t) / 100.0;
@@ -196,7 +390,7 @@ int main()
 		1e-9 * 2.0 * (double)n * (double)n * (double)n / seconds);
 
 	for (int i = 0; i < n * n; ++i) {
-		if (fabs(reference[i] - C[i]) > 1e-11) {
+		if (fabs(reference[i] - C[i]) > 1e-7) {
 			printf("error ! \n %.16le != %.16le\n", reference[i], C[i]);
 			return -1;
 		}
