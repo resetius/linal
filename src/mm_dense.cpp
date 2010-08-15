@@ -320,14 +320,12 @@ mat_mult_mat1(double * C, const double * A, const double * B, int n)
 
 				for (int i = 0; i < nll; ++i)
 				{
-					for (int j = 0; j < nlm; ++j)
+					for (int k1 = 0; k1 < nlm; ++k1)
 					{
-						double s = 0.0;
-						for (int k1 = 0; k1 < nlm; ++k1)
+						for (int j = 0; j < nlm; ++j)
 						{
-							s += As[i][k1] * Bs[k1][j];
+							C[(i + fl) * n + j + fm] += As[i][k1] * Bs[k1][j];
 						}
-						C[(i + fl) * n + j + fm] += s;
 					}
 				}
 			}
@@ -373,8 +371,8 @@ int main()
 	t = get_full_time();
 	//omp_set_num_threads(4);
 	//mat_mult_mat(&C[0], &A[0], &B[0], n);
-	mat_mult_mat_cannon(&C[0], &A[0], &B[0], n);
-	//mat_mult_mat1(&C[0], &A[0], &B[0], n);
+	//mat_mult_mat_cannon(&C[0], &A[0], &B[0], n);
+	mat_mult_mat1(&C[0], &A[0], &B[0], n);
 
 	seconds = (get_full_time() - t) / 100.0;
 	printf("t=%lf, gflops=%lf\n", seconds, 
