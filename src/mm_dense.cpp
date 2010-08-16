@@ -29,6 +29,7 @@
 
 #include <string.h>
 #include <math.h>
+#include <stdio.h>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -266,10 +267,12 @@ mat_mult_mat1(double * C, const double * A, const double * B, int n)
 {
 	double As[block_dim][block_dim];
 	double Bs[block_dim][block_dim];
-	double Cs[block_dim][block_dim];
 
 	int id  = get_my_id();
 	int num = get_num_threads();
+
+	memset(As, 0, block_dim * block_dim * sizeof(double));
+	memset(Bs, 0, block_dim * block_dim * sizeof(double));
 
 #pragma omp for
 	for (int i = 0; i < n * n; ++i)
@@ -302,34 +305,36 @@ mat_mult_mat1(double * C, const double * A, const double * B, int n)
 				lk = lk / blocks - 1;
 				int nlk = lk - fk + 1;
 
+				double * pb = &Bs[0][0];
+				double * pa = &As[0][0];
+
 				for (int i = 0; i < nlm; ++i)
 				{
-					memcpy(&Bs[i][0], &B[(i + fk) * n + fm], nlk * sizeof(double));
-					/*
+					const double * bb = &B[(i + fk) * n + fm];
 					for (int j = 0; j < nlk; ++j)
 					{
-						Bs[i][j] = B[(i + fk) * n + (j + fm)];
+						*pb++ = *bb++;
 					}
-					*/
+					
 				}
 
 				for (int i = 0; i < nll; ++i)
 				{
-					memcpy(&As[i][0], &A[(i + fl) * n + fk], nlk * sizeof(double));
-					/*
+					const double * aa = &A[(i + fl) * n + fk];
 					for (int j = 0; j < nlk; ++j)
 					{
-						As[i][j] = A[(i + fl) * n + (j + fk)];
-					}*/
+						*pa++ = *aa++;
+					}
 				}
+
+				pa = &As[0][0];
 
 				for (int i = 0; i < nll; ++i)
 				{
-					double * pa = &As[i][0];
+					pb = &Bs[0][0];
 					for (int k1 = 0; k1 < nlm; ++k1)
 					{
 						double * pc = &C[(i + fl) * n + fm];
-						double * pb = &Bs[k1][0];
 						for (int j = 0; j < nlm; ++j)
 						{
 							*pc++ += *pa * *pb++;
@@ -354,7 +359,7 @@ mat_mult_mat1(double * C, const double * A, const double * B, int n)
 using namespace std;
 using namespace linal;
 
-#define N 1024L
+#define N 512L
 #define CHECK
 
 int main()
