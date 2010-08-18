@@ -1,3 +1,5 @@
 1. run la_test_solver (mult_dense)
 2. make mult_dense GPU version
 3. sparse matrix save and load functions
+4. parallel gmres version (important)
+5. invert sparse matrix (important)
