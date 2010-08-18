@@ -3,3 +3,7 @@
 3. sparse matrix save and load functions
 4. parallel gmres version (important)
 5. invert sparse matrix (important)
+6. blas backend (important)
+7. atlas backend (important)
+8. acml backend (important)
+9. mkl backend (important)
