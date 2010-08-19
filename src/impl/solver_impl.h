@@ -265,13 +265,7 @@ void SimpleSolver < T > ::mult_vector (T * out, const T * in)
 template < typename T >
 void SimpleSolver < T > ::solve (T * x, const T * b)
 {
-	Timer t;
-
 	gauss (&A_[0], &b[0], &x[0], n_);
-
-#ifdef _DEBUG
-	fprintf (stderr, "solver time: %lf\n", t.elapsed() );
-#endif
 }
 
 template < typename T >
