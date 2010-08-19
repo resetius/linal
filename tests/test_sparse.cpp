@@ -55,18 +55,18 @@ bool test_mult_sparse (FILE * f, int iters)
 	if (!memcmp(tag, "CSR ", 4)) {
 		if (size == 4) {
 			do_test_mult_sparse < StoreCSR < float > > (f, iters);
-		} else if (size == 8) {
+		} else if (size == 8 && check_device_supports_double()) {
 			do_test_mult_sparse < StoreCSR < double > > (f, iters);
 		} else {
-			throw runtime_error("unknown format\n");
+			throw runtime_error("unsupported floating point format\n");
 		}
 	} else if (!memcmp(tag, "ELL ", 4)) {
 		if (size == 4) {
 			do_test_mult_sparse < StoreELL < float > > (f, iters);
-		} else if (size == 8) {
+		} else if (size == 8 && check_device_supports_double()) {
 			do_test_mult_sparse < StoreELL < double > > (f, iters);
 		} else {
-			throw runtime_error("unknown format\n");
+			throw runtime_error("unsupported floating point format\n");
 		}
 	} else {
 		throw runtime_error("unknown format\n");
@@ -144,9 +144,6 @@ int main (int argc, char * argv[])
 
 	try
 	{
-		int has_double = check_device_supports_double();
-		fprintf (stderr, "has double: %d\n", has_double);
-
 		Timer t;
 		//burn (1.0);
 		t.restart();
@@ -171,7 +168,7 @@ int main (int argc, char * argv[])
 	}
 
 	linal_shutdown();
-	fclose(f);
+	if (f) fclose(f);
 	return (int) (!result);
 }
 
