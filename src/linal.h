@@ -326,108 +326,6 @@ void vec_copy_from_device (T * b, const T * a, int n)
 #endif
 }
 
-template < typename T, typename Alloc >
-class Array
-{
-	typedef Array < T, Alloc > my_type;
-
-	size_t size_;
-	T * data_;
-	Alloc alloc_;
-
-public:
-	Array() : size_ (0), data_ (0) {}
-	Array (size_t size) : size_ (size), data_ (0)
-	{
-		data_ = alloc_.allocate (size_);
-	}
-
-	~Array()
-	{
-		if (data_)
-		{
-			alloc_.deallocate (data_, size_);
-		}
-	}
-
-	Array (const my_type & other) : size_ (0), data_ (0)
-	{
-		operator = (other);
-	}
-
-	Array & operator = (const my_type & other)
-	{
-		if (data_)
-		{
-			alloc_.deallocate (data_, size_);
-			data_ = 0;
-		}
-		size_ = other.size_;
-		if (size_ > 0)
-		{
-			data_ = alloc_.allocate (size_);
-			vec_copy (data_, other.data_, (int) size_);
-		}
-		return *this;
-	}
-
-	void resize (size_t size)
-	{
-		if (size > size_)
-		{
-			T * p = alloc_.allocate (size);
-			if (data_)
-			{
-				vec_copy (p, data_, (int) size);
-				alloc_.deallocate (data_, size_);
-			}
-			data_ = p;
-			size_ = size;
-		}
-	}
-
-	size_t size() const
-	{
-		return size_;
-	}
-	bool empty() const
-	{
-		return size_ == 0;
-	}
-
-	T & operator [] (int i)
-	{
-		assert (i < (int) size_);
-		return data_[i];
-	}
-
-	const T & operator [] (int i) const
-	{
-		assert (i < (int) size_);
-		return data_[i];
-	}
-};
-
-template < typename T  >
-struct ArrayHost: public Array < T, std::allocator < T > >
-{
-	ArrayHost() : Array < T, std::allocator < T > > () {}
-	ArrayHost (size_t size) : Array < T, std::allocator < T > > (size) {}
-};
-
-template < typename T  >
-struct ArrayDevice: public Array < T, Allocator < T > >
-{
-	ArrayDevice() : Array < T,  Allocator < T > > () {}
-	ArrayDevice (size_t size) : Array < T,  Allocator < T > > (size) {}
-};
-
-/**
- * @ingroup misc
- * array.
- */
-typedef Array < double, Allocator < double > > vec;
-
 int check_device_supports_double();
 void linal_init();
 void linal_shutdown();
@@ -447,6 +345,7 @@ void set_num_threads (int threads);
 #include "pow.h"
 #include "timer.h"
 #include "fpe.h"
+#include "array.h"
 
 #endif /* PHELM_LA_H */
 

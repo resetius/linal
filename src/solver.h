@@ -53,6 +53,7 @@
 #undef SUPERLU
 
 #include "allocator.h"
+#include "array.h"
 
 namespace linal
 {

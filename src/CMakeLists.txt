@@ -11,6 +11,7 @@ set(SOURCE
 	timer.h
 	fpe.cpp
 	fpe.h
+	array.h
 
 	gmres.h
 
