@@ -29,11 +29,18 @@ struct MatrixLoader
 {
 };
 
+template < typename Solver >
+void do_do_test_mult_sparse(const Solver & solver, FILE * f, int iters)
+{
+}
+
 template < typename Store >
 void do_test_mult_sparse(FILE * f, int iters)
 {
 	Store store;
 	store.restore(f);
+
+	do_do_test_mult_sparse(make_sparse_solver(store, store), f, iters);
 }
 
 bool test_mult_sparse (FILE * f, int iters)

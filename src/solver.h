@@ -224,7 +224,7 @@ struct DoubleStore
 
 	void dump(FILE * f)
 	{
-		throw std::runtime_error("dump not supported\n");
+		mult.dump(f);
 	}
 
 	void restore(FILE * f)
@@ -295,6 +295,16 @@ public:
 	{
 	}
 
+	SparseSolver (const MultStore & s1, const InvStore & s2)
+	{
+		if (s1.n_ != s2.n_) {
+			throw std::runtime_error("uncompatible stores\n");
+		}
+
+		store_.mult   = s1;
+		store_.invert = s2;
+	}
+
 	/**
 	 *  Add a number to element (i, j) (A[i][j] += a).
 	 *  @param i - index
@@ -333,10 +343,6 @@ public:
 	void add_matrix1 (my_type & A, const T * vec);
 	void add_matrix2 (my_type & A, const T * vec);
 };
-
-template < typename MultStore, typename InvStore >
-SparseSolver < typename MultStore::data_type, typename InvStore::data_type > 
-make_sparse_solver(MultStore & store1, InvStore & store2);
 
 #ifdef UMFPACK
 // implements UmfPackSolver

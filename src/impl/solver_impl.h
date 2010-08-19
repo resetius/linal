@@ -359,11 +359,10 @@ void SparseSolver < T, MultStore, InvStore > ::solve (T * x, const T * b)
 }
 
 template < typename MultStore, typename InvStore >
-SparseSolver < typename MultStore::data_type, typename InvStore::data_type >
-make_sparse_solver(MultStore & store1, InvStore & store2)
+SparseSolver < typename MultStore::data_type, MultStore, InvStore >
+make_sparse_solver(const MultStore & store1, const InvStore & store2)
 {
-	SparseSolver < typename MultStore::data_type, typename InvStore::data_type > ret(0);
-	ret.store_.mult   = store1;
-	ret.store_.invert = store2; 
+	SparseSolver < typename MultStore::data_type, MultStore, InvStore > ret(store1, store2);
+	return ret;
 }
 
