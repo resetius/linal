@@ -40,7 +40,7 @@ void do_test_mult_sparse(const Solver & solver, FILE * f, int iters)
 	}
 
 	double seconds = t.elapsed();
-	double gflops  = 1e-9 * 2.0 * (double)iters * (double)nz * (double)nz / seconds;
+	double gflops  = 1e-9 * 2.0 * (double)iters * (double)nz / seconds;
 	fprintf(stderr, "mult: %.16lfs, %.16lfgflops\n", seconds, gflops);
 }
 
