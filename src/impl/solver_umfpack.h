@@ -7,9 +7,9 @@
 template < typename T, typename MultStore >
 class UmfPackSolver: public SparseSolver < T, MultStore, StoreCSR < T, std::allocator > >
 {
-	double Control_ [UMFPACK_CONTROL];
-	double Info_ [UMFPACK_INFO];
-	void *Symbolic_, *Numeric_ ;
+	mutable double Control_ [UMFPACK_CONTROL];
+	mutable double Info_ [UMFPACK_INFO];
+	mutable void *Symbolic_, *Numeric_ ;
 
 	typedef StoreCSR < T, std::allocator > CSR;
 	typedef SparseSolver < T, MultStore, CSR > base;
@@ -35,7 +35,7 @@ public:
 	 * @param x - answer
 	 * @param b - right part
 	 */
-	void solve (T * x, const T * b)
+	void solve (T * x, const T * b) const
 	{
 		CSR & invert = base::store_.invert;
 		base::prepare();
@@ -70,14 +70,14 @@ public:
 template < typename MultStore >
 class UmfPackSolver < float, MultStore >: public SparseSolver < float, MultStore, StoreCSR < float, std::allocator > >
 {
-	double Control_ [UMFPACK_CONTROL];
-	double Info_ [UMFPACK_INFO];
-	void *Symbolic_, *Numeric_ ;
+	mutable double Control_ [UMFPACK_CONTROL];
+	mutable double Info_ [UMFPACK_INFO];
+	mutable void *Symbolic_, *Numeric_ ;
 
 	typedef StoreCSR < float, std::allocator > CSR;
 	typedef SparseSolver < float, MultStore, CSR > base;
 
-	std::vector < double > Ax_;
+	mutable std::vector < double > Ax_;
 
 public:
 	typedef float data_type;
@@ -100,7 +100,7 @@ public:
 	* @param x - answer
 	* @param b - right part
 	*/
-	void solve (float * x, const float * b)
+	void solve (float * x, const float * b) const
 	{
 		CSR & invert = base::store_.invert;
 		base::prepare();

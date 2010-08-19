@@ -180,11 +180,11 @@ class SuperLUSolver: public SparseSolver < T, MultStore, StoreCSR < T, std::allo
 	typedef StoreCSR < T, std::allocator > CSR;
 	typedef SparseSolver < T, MultStore, CSR > base;
 
-	SuperMatrix A_, AC_, L_, U_, B_;
+	mutable SuperMatrix A_, AC_, L_, U_, B_;
 
-	std::vector < int > perm_c_;
-	std::vector < int > perm_r_;
-	std::vector < int > etree_;
+	mutable std::vector < int > perm_c_;
+	mutable std::vector < int > perm_r_;
+	mutable std::vector < int > etree_;
 
 public:
 	typedef T data_type;
@@ -203,11 +203,11 @@ public:
 	 * @param x - answer
 	 * @param b - right part
 	 */
-	void solve (T * x, const T * b);
+	void solve (T * x, const T * b) const;
 };
 
 template < typename T, typename MultStore >
-void SuperLUSolver < T, MultStore > ::solve (T * x, const T * b)
+void SuperLUSolver < T, MultStore > ::solve (T * x, const T * b) const
 {
 	CSR & invert = base::store_.invert;
 

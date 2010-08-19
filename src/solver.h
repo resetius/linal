@@ -125,8 +125,8 @@ struct StoreCSR
 	 */
 	void add_matrix2 (const my_type & A, const T * vec);
 
-	void print(FILE * f);
-	void dump(FILE * f);
+	void print(FILE * f) const;
+	void dump(FILE * f) const;
 	void restore(FILE * f);
 };
 
@@ -161,7 +161,7 @@ struct StoreELL
 		Ax_.resize (cols_ * stride_);
 	}
 
-	bool empty()
+	bool empty() const
 	{
 		return n_ == 0;
 	}
@@ -186,12 +186,12 @@ struct StoreELL
 		assert (0);
 	}
 
-	void print(FILE * f)
+	void print(FILE * f) const
 	{
 		// implement
 	}
 
-	void dump(FILE * f);
+	void dump(FILE * f) const;
 	void restore(FILE * f);
 };
 
@@ -281,11 +281,11 @@ class SparseSolver
 {
 protected:
 	typedef DoubleStore < MultStore, InvStore > store_t;
-	store_t store_;
+	mutable store_t store_;
 	typedef std::map < int , T > row_t;
 	typedef std::vector < row_t > sparse_t;
 
-	sparse_t A_;
+	mutable sparse_t A_;
 
 public:
 	typedef T data_type;
@@ -305,6 +305,16 @@ public:
 		store_.invert = s2;
 	}
 
+	int dim() const
+	{
+		return store_.mult.n_;
+	}
+
+	int nonzero() const
+	{
+		return store_.mult.nz_;
+	}
+
 	/**
 	 *  Add a number to element (i, j) (A[i][j] += a).
 	 *  @param i - index
@@ -319,26 +329,26 @@ public:
 	 * @param x - answer
 	 * @param b - right part
 	 */
-	void solve (T * x, const T * b);
+	void solve (T * x, const T * b) const;
 
 	/**
 	 * Product of matrix by vector (out = A in).
 	 * @param out - result
 	 * @param in  - input vector
 	 */
-	void mult_vector (T * out, const T * in);
+	void mult_vector (T * out, const T * in) const;
 
 	/**
 	 * print matrix to file.
 	 */
-	void print(FILE * f);
-	void dump(FILE * f);
+	void print(FILE * f) const;
+	void dump(FILE * f) const;
 	void restore(FILE * f);
 
 	/**
 	 * fill permanent storage from temporary storage
 	 */
-	void prepare();
+	void prepare() const;
 
 	void add_matrix1 (my_type & A, const T * vec);
 	void add_matrix2 (my_type & A, const T * vec);

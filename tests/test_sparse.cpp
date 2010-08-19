@@ -24,26 +24,45 @@ void usage (const char * n)
 	exit (-1);
 }
 
-template < typename T >
-struct MatrixLoader
+template < typename Solver >
+void do_test_mult_sparse(const Solver & solver, FILE * f, int iters)
 {
-};
+	int n = solver.dim();
+	int nz = solver.nonzero();
+	vector < Solver::data_type > rp(n);
+	vector < Solver::data_type > ans(n);
+
+	Timer t;
+	for (int i = 0; i < iters; ++i) {
+		solver.mult_vector(&ans[0], &rp[0]);
+	}
+
+	double seconds = t.elapsed();
+	double gflops  = 1e-9 * 2.0 * (double)iters * (double)nz * (double)nz / seconds;
+	fprintf(stderr, "mult: %.16lfs, %.16lfgflops", seconds, gflops);
+}
 
 template < typename Solver >
-void do_do_test_mult_sparse(const Solver & solver, FILE * f, int iters)
+void do_test_invert_sparse(const Solver & solver, FILE * f, int iters)
 {
 }
 
 template < typename Store >
-void do_test_mult_sparse(FILE * f, int iters)
+void do_test_sparse(FILE * f, int iters, bool invert, bool mult)
 {
 	Store store;
 	store.restore(f);
 
-	do_do_test_mult_sparse(make_sparse_solver(store, store), f, iters);
+	if (mult) {
+		do_test_mult_sparse(make_sparse_solver(store, store), f, iters);
+	}
+
+	if (invert) {
+		do_test_invert_sparse(make_sparse_solver(store, store), f, iters);
+	}
 }
 
-bool test_mult_sparse (FILE * f, int iters)
+bool test_sparse (FILE * f, int iters, bool invert, bool mult)
 {
 	char tag[4];
 	int size;
@@ -54,30 +73,32 @@ bool test_mult_sparse (FILE * f, int iters)
 
 	if (!memcmp(tag, "CSR ", 4)) {
 		if (size == 4) {
-			do_test_mult_sparse < StoreCSR < float > > (f, iters);
+			do_test_sparse < StoreCSR < float > > (f, iters, invert, mult);
 		} else if (size == 8 && check_device_supports_double()) {
-			do_test_mult_sparse < StoreCSR < double > > (f, iters);
+			do_test_sparse < StoreCSR < double > > (f, iters, invert, mult);
 		} else {
 			throw runtime_error("unsupported floating point format\n");
 		}
 	} else if (!memcmp(tag, "ELL ", 4)) {
 		if (size == 4) {
-			do_test_mult_sparse < StoreELL < float > > (f, iters);
+			do_test_sparse < StoreELL < float > > (f, iters, invert, mult);
 		} else if (size == 8 && check_device_supports_double()) {
-			do_test_mult_sparse < StoreELL < double > > (f, iters);
+			do_test_sparse < StoreELL < double > > (f, iters, invert, mult);
 		} else {
 			throw runtime_error("unsupported floating point format\n");
 		}
 	} else {
 		throw runtime_error("unknown format\n");
 	}
+
+	return true;
 }
 
 int main (int argc, char * argv[])
 {
-	bool result        = true;
-	bool mult_sparse   = false;
-	bool invert_sparse = false;
+	bool result = true;
+	bool mult   = false;
+	bool invert = false;
 	FILE * f = 0;
 
 	int dim   = 0;
@@ -106,11 +127,11 @@ int main (int argc, char * argv[])
 
 			if (!strcmp (argv[i + 1], "mult_sparse") )
 			{
-				mult_sparse   = true;
+				mult   = true;
 			}
 			if (!strcmp (argv[i + 1], "invert_sparse") )
 			{
-				invert_sparse = true;
+				invert = true;
 			}
 		}
 		if (!strcmp (argv[i], "--iters") )
@@ -148,18 +169,10 @@ int main (int argc, char * argv[])
 		//burn (1.0);
 		t.restart();
 
-		if (invert_sparse)
-		{
-			t.restart();
-			fprintf (stderr, "invert_sparse (): %lf, %d\n", t.elapsed(), (int) result);
-		}
+		t.restart();
+		result &= test_sparse (f, iters, mult, invert);
+		fprintf (stderr, "test_mult_sparse (): %lf, %d\n", t.elapsed(), (int) result);
 
-		if (mult_sparse)
-		{
-			t.restart();
-			result &= test_mult_sparse (f, iters);
-			fprintf (stderr, "test_mult_sparse (): %lf, %d\n", t.elapsed(), (int) result);
-		}
 		fprintf (stderr, "elapsed: %lf\n", t.elapsed() );
 	}
 	catch (const std::exception & e)

@@ -88,13 +88,13 @@ void StoreCSR < T, Alloc > ::add_matrix2 (const my_type & A, const T * x)
 }
 
 template < typename T, template < class > class Alloc >
-void StoreCSR < T, Alloc > ::print(FILE * f)
+void StoreCSR < T, Alloc > ::print(FILE * f) const
 {
 	sparse_print(&Ap_[0], &Ai_[0], &Ax_[0], n_, f);
 }
 
 template < typename T, template < class > class Alloc >
-void StoreCSR < T, Alloc > ::dump(FILE * f)
+void StoreCSR < T, Alloc > ::dump(FILE * f) const
 {
 	int size = sizeof(T);
 	fwrite("CSR ", 4, 1, f);
@@ -203,7 +203,7 @@ void StoreELL < T, Alloc > ::mult (T * r, const T * x) const
 }
 
 template < typename T, template < class > class Alloc >
-void StoreELL < T, Alloc > ::dump (FILE * f)
+void StoreELL < T, Alloc > ::dump (FILE * f) const
 {
 	int size = sizeof(T);
 	fwrite("ELL ", 4, 1, f);
@@ -281,7 +281,7 @@ void SimpleSolver < T > ::print(FILE * f)
 }
 
 template < typename T, typename MultStore, typename InvStore  >
-void SparseSolver < T, MultStore, InvStore > ::prepare()
+void SparseSolver < T, MultStore, InvStore > ::prepare() const
 {
 	if (store_.mult.empty() )
 	{
@@ -311,21 +311,21 @@ void SparseSolver < T, MultStore, InvStore > ::add_matrix2 (my_type & A, const T
 }
 
 template < typename T, typename MultStore, typename InvStore  >
-void SparseSolver < T, MultStore, InvStore > ::mult_vector (T * out, const T * in)
+void SparseSolver < T, MultStore, InvStore > ::mult_vector (T * out, const T * in) const
 {
 	prepare();
 	store_.mult.mult (out, in);
 }
 
 template < typename T, typename MultStore, typename InvStore  >
-void SparseSolver < T, MultStore, InvStore > ::print(FILE * f)
+void SparseSolver < T, MultStore, InvStore > ::print(FILE * f) const
 {
 	prepare();
 	store_.print(f);
 }
 
 template < typename T, typename MultStore, typename InvStore  >
-void SparseSolver < T, MultStore, InvStore > ::dump(FILE * f)
+void SparseSolver < T, MultStore, InvStore > ::dump(FILE * f) const
 {
 	prepare();
 	store_.dump(f);
@@ -351,7 +351,7 @@ void SparseSolver__Ax (T * r, const Invert * invert, const T * x, int n)
 }
 
 template < typename T, typename MultStore, typename InvStore  >
-void SparseSolver < T, MultStore, InvStore > ::solve (T * x, const T * b)
+void SparseSolver < T, MultStore, InvStore > ::solve (T * x, const T * b) const
 {
 	prepare();
 	gmres (&x[0], &store_.invert, &b[0], SparseSolver__Ax < T, typename store_t::invert_t > ,
