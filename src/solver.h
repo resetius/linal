@@ -54,6 +54,7 @@
 
 #include "allocator.h"
 #include "array.h"
+#include "gmres.h"
 
 namespace linal
 {
