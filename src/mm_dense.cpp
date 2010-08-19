@@ -260,7 +260,7 @@ mat_mult_mat_cannon(double * C, const double * A, const double * B, int n)
 void
 mat_mult_mat1(double * C, const double * A, const double * B, int n)
 {
-#define block_dim 64
+#define block_dim 256
 	int blocks = (n + block_dim - 1) / block_dim;
 
 #pragma omp parallel
@@ -327,19 +327,22 @@ mat_mult_mat1(double * C, const double * A, const double * B, int n)
 					}
 				}
 
-				pa = &As[0][0];
 				for (int i = 0; i < nll; ++i)
 				{
 					pb = &Bs[0][0];
-					for (int k1 = 0; k1 < nlm; ++k1)
+					double * pc = &C[(i + fl) * n + fm];
+					for (int j = 0; j < nlm; ++j)
 					{
-						double * pc = &C[(i + fl) * n + fm];
-						for (int j = 0; j < nlm; ++j)
+						double s = 0.0;
+						pa = &As[i][0];
+						for (int k1 = 0; k1 < nlm; ++k1)
 						{
-							*pc++ += *pa * *pb++;
+							// A[i][k] * B[k][j]
+							s += *pa++ * *pb++;
 						}
 
-						++pa;
+						//C[(i + fl) * n + fm + j] += s;
+						*pc ++ += s;
 					}
 				}
 			}
@@ -358,8 +361,8 @@ mat_mult_mat1(double * C, const double * A, const double * B, int n)
 using namespace std;
 using namespace linal;
 
-#define N 512L
-#define CHECK
+#define N 1024L
+//#define CHECK
 
 int main()
 {

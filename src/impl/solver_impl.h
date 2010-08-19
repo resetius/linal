@@ -96,6 +96,9 @@ void StoreCSR < T, Alloc > ::print(FILE * f)
 template < typename T, template < class > class Alloc >
 void StoreCSR < T, Alloc > ::dump(FILE * f)
 {
+	int size = sizeof(T);
+	fwrite("CSR ", 4, 1, f);
+	fwrite(&size, 4, 1, f);
 	fwrite(&n_,  sizeof(n_), 1, f);
 	fwrite(&nz_, sizeof(nz_), 1, f);
 	if (nz_) {
@@ -108,8 +111,32 @@ void StoreCSR < T, Alloc > ::dump(FILE * f)
 template < typename T, template < class > class Alloc >
 void StoreCSR < T, Alloc > ::restore(FILE * f)
 {
-	fread(&n_, sizeof(n_), 1, f);
-	fread(&nz_, sizeof(nz_), 1, f);
+	char tag[4];
+	int size;
+	off_t fsize;
+
+	fseek(f, 0L, SEEK_END);
+	fsize = ftell(f);
+	fseek(f, 0L, SEEK_SET);
+
+	if (fread(tag, 4, 1, f) != 1 || memcmp(tag, "CSR ", 4) != 0) {
+		throw std::runtime_error("bad file format");
+	}
+
+	if (fread(&size, 4, 1, f) != 1 || size != sizeof(T)) {
+		throw std::runtime_error("bad file format");
+	}
+
+	if (fread(&n_, sizeof(n_), 1, f) !=1 ||	fread(&nz_, sizeof(nz_), 1, f) != 1)
+	{
+		throw std::runtime_error("bad file format");
+	}
+
+	if (fsize != (n_ + 1) * sizeof(int) + nz_ * sizeof(int) + nz_ * sizeof(T) + 4 + 4 + 4 + 4)
+	{
+		throw std::runtime_error("bad file format");
+	}
+
 	if (nz_) {
 		Ap_.resize(n_ + 1);
 		Ai_.resize(nz_);
@@ -178,6 +205,10 @@ void StoreELL < T, Alloc > ::mult (T * r, const T * x) const
 template < typename T, template < class > class Alloc >
 void StoreELL < T, Alloc > ::dump (FILE * f)
 {
+	int size = sizeof(T);
+	fwrite("ELL ", 4, 1, f);
+	fwrite(&size, 4, 1, f);
+
 	fwrite(&n_, sizeof(n_), 1, f);
 	fwrite(&nz_, sizeof(nz_), 1, f);
 	fwrite(&cols_, sizeof(cols_), 1, f);
@@ -191,6 +222,28 @@ void StoreELL < T, Alloc > ::dump (FILE * f)
 template < typename T, template < class > class Alloc >
 void StoreELL < T, Alloc > ::restore (FILE * f)
 {
+	char tag[4];
+	int size;
+	off_t fsize;
+
+	fseek(f, 0L, SEEK_END);
+	fsize = ftell(f);
+	fseek(f, 0L, SEEK_SET);
+
+	if (fread(tag, 4, 1, f) != 1 || memcmp(tag, "CSR ", 4) != 0) {
+		throw std::runtime_error("bad file format");
+	}
+
+	if (fread(&size, 4, 1, f) != 1 || size != sizeof(T)) {
+		throw std::runtime_error("bad file format");
+	}
+
+	if (fsize != 4 + 4 + sizeof(n_) + sizeof(nz_) + sizeof(cols_) + sizeof(stride_)
+			+ cols_ * stride_ * sizeof(int) + cols_ * stride_ * sizeof(T))
+	{
+		throw std::runtime_error("bad file format");
+	}
+
 	fread(&n_, sizeof(n_), 1, f);
 	fread(&nz_, sizeof(nz_), 1, f);
 	fread(&cols_, sizeof(cols_), 1, f);
@@ -310,3 +363,13 @@ void SparseSolver < T, MultStore, InvStore > ::solve (T * x, const T * b)
 	gmres (&x[0], &store_.invert, &b[0], SparseSolver__Ax < T, typename store_t::invert_t > ,
 	       store_.invert.n_, 100, 1000);
 }
+
+template < typename MultStore, typename InvStore >
+SparseSolver < typename MultStore::data_type, typename InvStore::data_type >
+make_sparse_solver(MultStore & store1, InvStore & store2)
+{
+	SparseSolver < typename MultStore::data_type, typename InvStore::data_type > ret(0);
+	ret.store_.mult   = store1;
+	ret.store_.invert = store2; 
+}
+

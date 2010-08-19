@@ -41,6 +41,7 @@
 #include <assert.h>
 
 #include <vector>
+#include <stdexcept>
 #include <map>
 
 #ifdef SPARSE
@@ -51,7 +52,6 @@
 
 #undef SUPERLU
 
-#include "gmres.h"
 #include "allocator.h"
 
 namespace linal
@@ -222,14 +222,12 @@ struct DoubleStore
 
 	void dump(FILE * f)
 	{
-		mult.dump(f);
-		invert.dump(f);
+		throw std::runtime_error("dump not supported\n");
 	}
 
 	void restore(FILE * f)
 	{
-		mult.restore(f);
-		invert.restore(f);
+		throw std::runtime_error("restore not supported\n");
 	}
 };
 
@@ -333,6 +331,10 @@ public:
 	void add_matrix1 (my_type & A, const T * vec);
 	void add_matrix2 (my_type & A, const T * vec);
 };
+
+template < typename MultStore, typename InvStore >
+SparseSolver < typename MultStore::data_type, typename InvStore::data_type > 
+make_sparse_solver(MultStore & store1, InvStore & store2);
 
 #ifdef UMFPACK
 // implements UmfPackSolver
