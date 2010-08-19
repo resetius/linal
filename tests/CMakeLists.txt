@@ -6,12 +6,16 @@ include_directories(${LINAL_INCLUDE})
 add_executable(la_test_solver test_solver.cpp)
 target_link_libraries(la_test_solver ${LINAL_LIBS})
 
+add_executable(la_test_sparse test_sparse.cpp)
+target_link_libraries(la_test_sparse ${LINAL_LIBS})
+
 add_definitions(-DTEST)
 add_executable(la_test_lu ../src/lu_solve.cpp)
 add_executable(la_test_mm_dense ../src/mm_dense.cpp ../src/timer.cpp)
 
 if (OPENMP_FOUND)
 	set_target_properties(la_test_solver PROPERTIES LINK_FLAGS ${OpenMP_C_FLAGS})
+	set_target_properties(la_test_sparse PROPERTIES LINK_FLAGS ${OpenMP_C_FLAGS})
 	set_target_properties(la_test_lu PROPERTIES LINK_FLAGS ${OpenMP_C_FLAGS})
 	set_target_properties(la_test_mm_dense PROPERTIES LINK_FLAGS ${OpenMP_C_FLAGS})
 endif (OPENMP_FOUND)
