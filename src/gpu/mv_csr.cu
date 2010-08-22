@@ -95,7 +95,7 @@ __host__ void csr_mult_vector_r(float * r,
 
 	useTexture = ((n + 1 < MAX_1DBUF_SIZE) && (nz < MAX_1DBUF_SIZE));
 
-	if (n < 1000) /* experimental bound */
+	if (n < 1000 || n > 10000) /* experimental bound */
 	{
 		useTexture = false;
 	}

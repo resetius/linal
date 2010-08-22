@@ -170,18 +170,18 @@ int main (int argc, char * argv[])
 	fprintf(stderr, "mult: %d, invert: %d\n", (int)mult, (int)invert);
 	linal_init();
 
-	try
-	{
+//	try
+//	{
 		Timer t;
 		//burn (1.0);
 		t.restart();
 		result &= test_sparse (f, iters, mult, invert);
 		fprintf (stderr, "elapsed: %lf\n", t.elapsed() );
-	}
-	catch (const std::exception & e)
-	{
-		fprintf (stderr, "exception: %s\n", e.what() );
-	}
+//	}
+//	catch (const std::exception & e)
+//	{
+//		fprintf (stderr, "exception: %s\n", e.what() );
+//	}
 
 	linal_shutdown();
 	if (f) fclose(f);
