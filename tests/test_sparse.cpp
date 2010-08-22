@@ -104,7 +104,7 @@ int main (int argc, char * argv[])
 	FILE * f = 0;
 
 	int dim   = 0;
-	int iters = 0;
+	int iters = 1000;
 
 	for (int i = 0; i < argc; ++i)
 	{

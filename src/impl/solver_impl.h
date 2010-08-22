@@ -230,7 +230,7 @@ void StoreELL < T, Alloc > ::restore (FILE * f)
 	fsize = ftell(f);
 	fseek(f, 0L, SEEK_SET);
 
-	if (fread(tag, 4, 1, f) != 1 || memcmp(tag, "CSR ", 4) != 0) {
+	if (fread(tag, 4, 1, f) != 1 || memcmp(tag, "ELL ", 4) != 0) {
 		throw std::runtime_error("bad file format");
 	}
 
@@ -238,16 +238,17 @@ void StoreELL < T, Alloc > ::restore (FILE * f)
 		throw std::runtime_error("bad file format");
 	}
 
+	fread(&n_, sizeof(n_), 1, f);
+	fread(&nz_, sizeof(nz_), 1, f);
+	fread(&cols_, sizeof(cols_), 1, f);
+	fread(&stride_, sizeof(stride_), 1, f);
+
 	if (fsize != 4 + 4 + sizeof(n_) + sizeof(nz_) + sizeof(cols_) + sizeof(stride_)
 			+ cols_ * stride_ * sizeof(int) + cols_ * stride_ * sizeof(T))
 	{
 		throw std::runtime_error("bad file format");
 	}
 
-	fread(&n_, sizeof(n_), 1, f);
-	fread(&nz_, sizeof(nz_), 1, f);
-	fread(&cols_, sizeof(cols_), 1, f);
-	fread(&stride_, sizeof(stride_), 1, f);
 	if (nz_) {
 		Ai_.resize(cols_ * stride_);
 		Ax_.resize(cols_ * stride_);

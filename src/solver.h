@@ -244,6 +244,10 @@ struct DoubleStore < Store, Store >
 	Store & mult;
 	Store & invert;
 	DoubleStore () : mult (both), invert (both) {}
+	DoubleStore (const DoubleStore < Store, Store > & r)
+		: both(r.both), mult (both), invert (both)
+	{
+	}
 
 	void add_matrix1 (const my_type & A, const typename Store::data_type * vec)
 	{
