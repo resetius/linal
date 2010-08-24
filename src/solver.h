@@ -85,6 +85,16 @@ struct StoreCSR
 	StoreCSR() : n_ (0), nz_ (0) {}
 	StoreCSR (int n, int nz) : n_ (n), nz_ (nz), Ap_ (n_ + 1), Ai_ (nz_), Ax_ (nz_) {}
 
+	template < template < class > class A >
+	my_type & operator = (const StoreCSR < T, A > & o)
+	{
+		n_  = o.n_;
+		nz_ = o.nz_;
+		array_copy(Ap_, o.Ap_);
+		array_copy(Ai_, o.Ai_);
+		array_copy(Ax_, o.Ax_);
+	}
+
 	void resize (int n, int nz)
 	{
 		n_  = n;
@@ -299,7 +309,8 @@ public:
 	{
 	}
 
-	SparseSolver (const MultStore & s1, const InvStore & s2)
+	template < typename Store1, typename Store2 >
+	SparseSolver (const Store1 & s1, const Store2 & s2)
 	{
 		if (s1.n_ != s2.n_) {
 			throw std::runtime_error("uncompatible stores\n");

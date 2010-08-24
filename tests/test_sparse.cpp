@@ -47,6 +47,21 @@ void do_test_mult_sparse(const Solver & solver, FILE * f, int iters)
 template < typename Solver >
 void do_test_invert_sparse(const Solver & solver, FILE * f, int iters)
 {
+	int n = solver.dim();
+	int nz = solver.nonzero();
+	vector < typename Solver::data_type > rp(n);
+	vector < typename Solver::data_type > ans(n);
+
+	fprintf(stderr, "invert: n:%d, nz:%d\n", n, nz);
+	Timer t;
+#pragma omp parallel for
+	for (int i = 0; i < n; ++i) {
+		rp[i] = 1.0;
+		solver.solve(&ans[0], &rp[0]);
+	}
+
+	double seconds = t.elapsed();
+	fprintf(stderr, "mult: %.16lfs\n", seconds);
 }
 
 template < typename Store >
@@ -60,7 +75,7 @@ void do_test_sparse(FILE * f, int iters, bool mult, bool invert)
 	}
 
 	if (invert) {
-		do_test_invert_sparse(make_sparse_solver(store, store), f, iters);
+		do_test_invert_sparse(make_umfpack_solver(store, store), f, iters);
 	}
 }
 
@@ -83,9 +98,11 @@ bool test_sparse (FILE * f, int iters, bool mult, bool invert)
 		}
 	} else if (!memcmp(tag, "ELL ", 4)) {
 		if (size == 4) {
-			do_test_sparse < StoreELL < float > > (f, iters, mult, invert);
+			throw runtime_error("ELL not implemented yet\n");
+//			do_test_sparse < StoreELL < float > > (f, iters, mult, invert);
 		} else if (size == 8 && check_device_supports_double()) {
-			do_test_sparse < StoreELL < double > > (f, iters, mult, invert);
+			throw runtime_error("ELL not implemented yet\n");
+//			do_test_sparse < StoreELL < double > > (f, iters, mult, invert);
 		} else {
 			throw runtime_error("unsupported floating point format\n");
 		}

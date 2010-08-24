@@ -125,19 +125,80 @@ public:
 	}
 };
 
-template < typename T  >
+template < typename T > struct ArrayDevice;
+
+template < typename T >
 struct ArrayHost: public Array < T, std::allocator < T > >
 {
 	ArrayHost() : Array < T, std::allocator < T > > () {}
 	ArrayHost (size_t size) : Array < T, std::allocator < T > > (size) {}
+
+	ArrayHost<T> & operator = (const ArrayDevice < T > & other);
 };
 
-template < typename T  >
+template < typename T >
 struct ArrayDevice: public Array < T, Allocator < T > >
 {
 	ArrayDevice() : Array < T,  Allocator < T > > () {}
 	ArrayDevice (size_t size) : Array < T,  Allocator < T > > (size) {}
+
+	ArrayDevice<T> & operator = (const ArrayHost < T > & other);
 };
+
+template < typename T >
+ArrayHost<T> & ArrayHost<T>::operator = (const ArrayDevice < T > & other)
+{
+	resize(other.size());
+	vec_copy_from_device(&(*this)[0], &other[0], this->size());
+}
+
+template < typename T >
+ArrayDevice<T> & ArrayDevice<T>::operator = (const ArrayHost < T > & other)
+{
+	resize(other.size());
+	vec_copy_from_host(&(*this)[0], &other[0], this->size());
+}
+
+template < typename T, template<class> class Alloc1, template<class> class Alloc2 >
+struct ArrayCopier
+{
+};
+
+template < typename T, template<class> class Alloc1 >
+struct ArrayCopier < T, Alloc1, Alloc1 >
+{
+	void copy(Array < T, Alloc1 < T > > & ar1, const Array < T, Alloc1 < T > > & ar2)
+	{
+		ar1 = ar2;
+	}
+};
+
+template < typename T >
+struct ArrayCopier < T, std::allocator, Allocator >
+{
+	void copy(Array < T, std::allocator < T > > & ar1, const Array < T, Allocator < T > > & ar2)
+	{
+		ar1.resize(ar2.size());
+		vec_copy_from_device(&ar1[0], &ar2[0], ar1.size());
+	}
+};
+
+template < typename T >
+struct ArrayCopier < T, Allocator, std::allocator >
+{
+	void copy(Array < T, Allocator < T > > & ar1, const Array < T, std::allocator < T > > & ar2)
+	{
+		ar1.resize(ar2.size());
+		vec_copy_from_host(&ar1[0], &ar2[0], ar1.size());
+	}
+};
+
+template < typename T, template<class> class Alloc1, template<class> class Alloc2 >
+void array_copy(Array < T, Alloc1 < T > > & ar1, const Array < T, Alloc2 < T > > & ar2)
+{
+	ArrayCopier < T, Alloc1, Alloc2 > copier;
+	copier.copy(ar1, ar2);
+}
 
 /**
  * @ingroup misc

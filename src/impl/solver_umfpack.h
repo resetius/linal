@@ -18,6 +18,13 @@ public:
 	typedef T data_type;
 	typedef UmfPackSolver < T, MultStore > my_type;
 
+	template < typename T1, typename T2 >
+	UmfPackSolver (const T1 & store1, const T2 & store2): 
+		base(store1, store2), Symbolic_ (0), Numeric_ (0)
+	{
+		umfpack_di_defaults (Control_);
+	}
+
 	UmfPackSolver (int n) : base (n), Symbolic_ (0), Numeric_ (0)
 	{
 		umfpack_di_defaults (Control_);
@@ -82,6 +89,13 @@ class UmfPackSolver < float, MultStore >: public SparseSolver < float, MultStore
 public:
 	typedef float data_type;
 	typedef UmfPackSolver < float, MultStore > my_type;
+
+	template < typename T1, typename T2 >
+	UmfPackSolver (const T1 & store1, const T2 & store2): 
+		base(store1, store2), Symbolic_ (0), Numeric_ (0)
+	{
+		umfpack_di_defaults (Control_);
+	}
 
 	UmfPackSolver (int n) : base (n), Symbolic_ (0), Numeric_ (0)
 	{
@@ -151,3 +165,12 @@ public:
 		}
 	}
 };
+
+template < typename MultStore, typename InvStore >
+UmfPackSolver < typename MultStore::data_type, MultStore >
+make_umfpack_solver(const MultStore & store1, const InvStore & store2)
+{
+	UmfPackSolver < typename MultStore::data_type, MultStore > ret(store1, store2);
+	return ret;
+}
+
