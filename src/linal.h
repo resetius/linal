@@ -346,6 +346,7 @@ void set_num_threads (int threads);
 #include "timer.h"
 #include "fpe.h"
 #include "array.h"
+#include "array_pool.h"
 
 #endif /* PHELM_LA_H */
 
