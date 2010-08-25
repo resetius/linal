@@ -102,9 +102,14 @@ void StoreCSR < T, Alloc > ::dump(FILE * f) const
 	fwrite(&n_,  sizeof(n_), 1, f);
 	fwrite(&nz_, sizeof(nz_), 1, f);
 	if (nz_) {
-		fwrite(&Ap_[0], sizeof(int), Ap_.size(), f);
-		fwrite(&Ai_[0], sizeof(int), nz_, f);
-		fwrite(&Ax_[0], sizeof(T), nz_, f);
+		Array<int,std::allocator<int> > Ap, Ai;
+		Array<T,std::allocator<T> > Ax;
+		array_copy(Ap, Ap_);
+		array_copy(Ai, Ai_);
+		array_copy(Ax, Ax_);
+		fwrite(&Ap[0], sizeof(int), Ap.size(), f);
+		fwrite(&Ai[0], sizeof(int), nz_, f);
+		fwrite(&Ax[0], sizeof(T), nz_, f);
 	}
 }
 
@@ -138,12 +143,14 @@ void StoreCSR < T, Alloc > ::restore(FILE * f)
 	}
 
 	if (nz_) {
-		Ap_.resize(n_ + 1);
-		Ai_.resize(nz_);
-		Ax_.resize(nz_);
-		fread(&Ap_[0], sizeof(int), n_ + 1, f);
-		fread(&Ai_[0], sizeof(int), nz_, f);
-		fread(&Ax_[0], sizeof(T), nz_, f);
+		Array < int, std::allocator <int> > Ap(n_ + 1), Ai(nz_);
+		Array < T, std::allocator <T> > Ax(nz_);
+		fread(&Ap[0], sizeof(int), n_ + 1, f);
+		fread(&Ai[0], sizeof(int), nz_, f);
+		fread(&Ax[0], sizeof(T), nz_, f);
+		array_copy(Ap_, Ap);
+		array_copy(Ai_, Ai);
+		array_copy(Ax_, Ax);
 	}
 }
 
@@ -214,8 +221,12 @@ void StoreELL < T, Alloc > ::dump (FILE * f) const
 	fwrite(&cols_, sizeof(cols_), 1, f);
 	fwrite(&stride_, sizeof(stride_), 1, f);
 	if (nz_) {
-		fwrite(&Ai_[0], sizeof(int), cols_ * stride_, f);
-		fwrite(&Ax_[0], sizeof(T), cols_ * stride_, f);
+		Array < int, std::allocator<int> > Ai;
+		Array < T, std::allocator<T> > Ax;
+		array_copy(Ai, Ai_);
+		array_copy(Ax, Ax_);
+		fwrite(&Ai[0], sizeof(int), cols_ * stride_, f);
+		fwrite(&Ax[0], sizeof(T), cols_ * stride_, f);
 	}
 }
 
@@ -250,10 +261,12 @@ void StoreELL < T, Alloc > ::restore (FILE * f)
 	}
 
 	if (nz_) {
-		Ai_.resize(cols_ * stride_);
-		Ax_.resize(cols_ * stride_);
-		fread(&Ai_[0], sizeof(int), cols_ * stride_, f);
-		fread(&Ax_[0], sizeof(T), cols_ * stride_, f);
+		Array < int, std::allocator<int> > Ai(cols_ * stride_);
+		Array < T, std::allocator<T> >     Ax(cols_ * stride_);
+		fread(&Ai[0], sizeof(int), cols_ * stride_, f);
+		fread(&Ax[0], sizeof(T), cols_ * stride_, f);
+		array_copy(Ai_, Ai);
+		array_copy(Ax_, Ax);
 	}
 }
 	

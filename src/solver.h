@@ -162,6 +162,17 @@ struct StoreELL
 	{
 	}
 
+	template < template < class > class A >
+	my_type & operator = (const StoreELL < T, A > & o)
+	{
+		n_      = o.n_;
+		nz_     = o.nz_;
+		cols_   = o.cols_;
+		stride_ = o.stride_;
+		array_copy(Ai_, o.Ai_);
+		array_copy(Ax_, o.Ax_);
+	}
+
 	void resize (int n, int nz, int cols)
 	{
 		n_    = n;
