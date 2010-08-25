@@ -66,6 +66,33 @@ void StoreCSR < T, Alloc > ::load (const std::vector < row_t > & A)
 }
 
 template < typename T, template < class > class Alloc >
+template < template < class > class A >
+StoreCSR < T, Alloc > & StoreCSR < T, Alloc >::operator = (const StoreCSR < T, A > & o)
+{
+	n_  = o.n_;
+	nz_ = o.nz_;
+	array_copy(Ap_, o.Ap_);
+	array_copy(Ai_, o.Ai_);
+	array_copy(Ax_, o.Ax_);
+}
+
+template < typename T, template < class > class Alloc >
+void StoreCSR < T, Alloc >::resize (int n, int nz)
+{
+	n_  = n;
+	nz_ = nz;
+	Ap_.resize (n_ + 1);
+	Ai_.resize (nz_);
+	Ax_.resize (nz_);
+}
+
+template < typename T, template < class > class Alloc >
+bool StoreCSR < T, Alloc >::empty () const
+{
+	return n_ == 0;
+}
+
+template < typename T, template < class > class Alloc >
 void StoreCSR < T, Alloc > ::mult (T * r, const T * x) const
 {
 	csr_mult_vector_r (r, &Ap_[0], &Ai_[0], &Ax_[0], x, n_, nz_);
@@ -152,6 +179,35 @@ void StoreCSR < T, Alloc > ::restore(FILE * f)
 		array_copy(Ai_, Ai);
 		array_copy(Ax_, Ax);
 	}
+}
+
+
+template < typename T, template < class > class Alloc >
+template < template < class > class A >
+StoreELL < T, Alloc > & StoreELL < T, Alloc >::operator = (const StoreELL < T, A > & o)
+{
+	n_      = o.n_;
+	nz_     = o.nz_;
+	cols_   = o.cols_;
+	stride_ = o.stride_;
+	array_copy(Ai_, o.Ai_);
+	array_copy(Ax_, o.Ax_);
+}
+
+template < typename T, template < class > class Alloc >
+void StoreELL < T, Alloc > ::resize (int n, int nz, int cols)
+{
+	n_    = n;
+	nz_   = nz;
+	cols_ = cols;
+	Ai_.resize (cols_ * stride_);
+	Ax_.resize (cols_ * stride_);
+}
+
+template < typename T, template < class > class Alloc >
+bool StoreELL < T, Alloc > ::empty() const
+{
+	return n_ == 0;
 }
 
 template < typename T, template < class > class Alloc >

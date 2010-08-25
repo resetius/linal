@@ -75,6 +75,8 @@ struct StoreCSR
 {
 	typedef T data_type;
 	typedef StoreCSR < T, Alloc> my_type;
+	typedef std::map < int , T > row_t;
+	typedef std::vector < row_t > sparse_t;
 
 	int n_;
 	int nz_;
@@ -86,31 +88,11 @@ struct StoreCSR
 	StoreCSR (int n, int nz) : n_ (n), nz_ (nz), Ap_ (n_ + 1), Ai_ (nz_), Ax_ (nz_) {}
 
 	template < template < class > class A >
-	my_type & operator = (const StoreCSR < T, A > & o)
-	{
-		n_  = o.n_;
-		nz_ = o.nz_;
-		array_copy(Ap_, o.Ap_);
-		array_copy(Ai_, o.Ai_);
-		array_copy(Ax_, o.Ax_);
-	}
+	StoreCSR < T, Alloc > & operator = (const StoreCSR < T, A > & o);
 
-	void resize (int n, int nz)
-	{
-		n_  = n;
-		nz_ = nz;
-		Ap_.resize (n_ + 1);
-		Ai_.resize (nz_);
-		Ax_.resize (nz_);
-	}
+	void resize (int n, int nz);
 
-	bool empty()
-	{
-		return n_ == 0;
-	}
-
-	typedef std::map < int , T > row_t;
-	typedef std::vector < row_t > sparse_t;
+	bool empty() const;
 
 	/**
 	 * Fill CSR Matrix from unstructured data
@@ -145,6 +127,8 @@ struct StoreELL
 {
 	typedef T data_type;
 	typedef StoreELL < T, Alloc > my_type;
+	typedef std::map < int , T > row_t;
+	typedef std::vector < row_t > sparse_t;
 
 	int n_;
 	int nz_;
@@ -163,32 +147,11 @@ struct StoreELL
 	}
 
 	template < template < class > class A >
-	my_type & operator = (const StoreELL < T, A > & o)
-	{
-		n_      = o.n_;
-		nz_     = o.nz_;
-		cols_   = o.cols_;
-		stride_ = o.stride_;
-		array_copy(Ai_, o.Ai_);
-		array_copy(Ax_, o.Ax_);
-	}
+	StoreELL < T, Alloc > & operator = (const StoreELL < T, A > & o);
 
-	void resize (int n, int nz, int cols)
-	{
-		n_    = n;
-		nz_   = nz;
-		cols_ = cols;
-		Ai_.resize (cols_ * stride_);
-		Ax_.resize (cols_ * stride_);
-	}
+	void resize (int n, int nz, int cols);
 
-	bool empty() const
-	{
-		return n_ == 0;
-	}
-
-	typedef std::map < int , T > row_t;
-	typedef std::vector < row_t > sparse_t;
+	bool empty() const;
 
 	/**
 	 * Fill ELL Matrix from unstructured data
