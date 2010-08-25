@@ -45,10 +45,8 @@ template < typename T >
 void csr_mult_vector_ (T * r, const int * Ap, const int * Ai,
                        const T * Ax, const T * x, int n)
 {
-	int j;
-
 #pragma omp parallel for
-	for (j = 0; j < n; ++j)
+	for (int j = 0; j < n; ++j)
 	{
 		const T *p = &Ax[Ap[j]];
 		T rj = (T) 0.0;

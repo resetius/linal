@@ -66,6 +66,8 @@ namespace linal
  * @{
  */
 
+template < typename T, template < class > class Alloc > struct StoreELL;
+
 /**
  *  Compressed Sparsed Row Format (CSR)
  *  Also known as Compressed Row Storage (CRS)
@@ -89,6 +91,8 @@ struct StoreCSR
 
 	template < template < class > class A >
 	StoreCSR < T, Alloc > & operator = (const StoreCSR < T, A > & o);
+	template < template < class > class A >
+	StoreCSR < T, Alloc > & operator = (const StoreELL < T, A > & o);
 
 	void resize (int n, int nz);
 
@@ -97,7 +101,8 @@ struct StoreCSR
 	/**
 	 * Fill CSR Matrix from unstructured data
 	 */
-	void load (const sparse_t & unstruct);
+	void import (const sparse_t & unstruct);
+	sparse_t export_() const;
 
 	void mult (T * r, const T * x) const;
 
@@ -148,6 +153,8 @@ struct StoreELL
 
 	template < template < class > class A >
 	StoreELL < T, Alloc > & operator = (const StoreELL < T, A > & o);
+	template < template < class > class A >
+	StoreELL < T, Alloc > & operator = (const StoreCSR < T, A > & o);
 
 	void resize (int n, int nz, int cols);
 
@@ -156,7 +163,8 @@ struct StoreELL
 	/**
 	 * Fill ELL Matrix from unstructured data
 	 */
-	void load (const sparse_t & unstruct);
+	void import (const sparse_t & unstruct);
+	sparse_t export_() const;
 
 	void mult (T * r, const T * x) const;
 

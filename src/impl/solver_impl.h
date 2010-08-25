@@ -28,7 +28,7 @@
  */
 
 template < typename T, template < class > class Alloc >
-void StoreCSR < T, Alloc > ::load (const std::vector < row_t > & A)
+void StoreCSR < T, Alloc > ::import (const std::vector < row_t > & A)
 {
 	int idx = 0;
 	n_  = (int) A.size();
@@ -66,6 +66,30 @@ void StoreCSR < T, Alloc > ::load (const std::vector < row_t > & A)
 }
 
 template < typename T, template < class > class Alloc >
+typename StoreCSR < T, Alloc >::sparse_t StoreCSR < T, Alloc > ::export_() const
+{
+	sparse_t ret(n_);
+	Array < int, std::allocator < int > > Ai, Ap;
+	Array < T, std::allocator < T > > Ax;
+	array_copy(Ai, Ai_);
+	array_copy(Ap, Ap_);
+	array_copy(Ax, Ax_);
+
+	for (int j = 0; j < n_; ++j)
+	{
+		const T *p = &Ax[Ap[j]];
+		int i0;
+
+		for (i0 = Ap[j]; i0 < Ap[j + 1]; ++i0, ++p)
+		{
+			int i = Ai[i0];
+			ret[j][i] = *p;
+		}
+	}
+	return ret;
+}
+
+template < typename T, template < class > class Alloc >
 template < template < class > class A >
 StoreCSR < T, Alloc > & StoreCSR < T, Alloc >::operator = (const StoreCSR < T, A > & o)
 {
@@ -74,6 +98,15 @@ StoreCSR < T, Alloc > & StoreCSR < T, Alloc >::operator = (const StoreCSR < T, A
 	array_copy(Ap_, o.Ap_);
 	array_copy(Ai_, o.Ai_);
 	array_copy(Ax_, o.Ax_);
+	return *this;
+}
+
+template < typename T, template < class > class Alloc >
+template < template < class > class A >
+StoreCSR < T, Alloc > & StoreCSR < T, Alloc >::operator = (const StoreELL < T, A > & o)
+{
+	import(o.export_());
+	return *this;
 }
 
 template < typename T, template < class > class Alloc >
@@ -117,6 +150,11 @@ void StoreCSR < T, Alloc > ::add_matrix2 (const my_type & A, const T * x)
 template < typename T, template < class > class Alloc >
 void StoreCSR < T, Alloc > ::print(FILE * f) const
 {
+	Array < int, std::allocator < int > > Ai, Ap;
+	Array < T, std::allocator < T > > Ax;
+	array_copy(Ai, Ai_);
+	array_copy(Ap, Ap_);
+	array_copy(Ax, Ax_);
 	sparse_print(&Ap_[0], &Ai_[0], &Ax_[0], n_, f);
 }
 
@@ -195,6 +233,13 @@ StoreELL < T, Alloc > & StoreELL < T, Alloc >::operator = (const StoreELL < T, A
 }
 
 template < typename T, template < class > class Alloc >
+template < template < class > class A >
+StoreELL < T, Alloc > & StoreELL < T, Alloc >::operator = (const StoreCSR < T, A > & o)
+{
+	import(o.export_());
+}
+
+template < typename T, template < class > class Alloc >
 void StoreELL < T, Alloc > ::resize (int n, int nz, int cols)
 {
 	n_    = n;
@@ -211,7 +256,7 @@ bool StoreELL < T, Alloc > ::empty() const
 }
 
 template < typename T, template < class > class Alloc >
-void StoreELL < T, Alloc > ::load (const std::vector < row_t > & A)
+void StoreELL < T, Alloc > ::import (const std::vector < row_t > & A)
 {
 	nz_ = 0; // non-null elements
 	n_  = (int) A.size();
@@ -257,6 +302,27 @@ void StoreELL < T, Alloc > ::load (const std::vector < row_t > & A)
 
 	vec_copy_from_host (&Ax_[0], &Ax[0], count);
 	vec_copy_from_host (&Ai_[0], &Ai[0], count);
+}
+
+template < typename T, template < class > class Alloc >
+typename StoreELL < T, Alloc >::sparse_t StoreELL < T, Alloc > ::export_() const
+{
+	sparse_t ret;
+	Array < int, std::allocator < int > > Ai;
+	Array < T, std::allocator < T > > Ax;
+	array_copy(Ai, Ai_);
+	array_copy(Ax, Ax_);
+
+	for (int row = 0; row < n_; ++row)
+	{
+		for (int i0 = 0; i0 < cols_; i0++)
+		{
+			const T A_ij = Ax[stride_ * i0 + row];
+			const int col = Ai[stride_ * i0 + row];
+			ret[row][col] = A_ij;
+		}
+	}
+	return ret;
 }
 
 template < typename T, template < class > class Alloc >
@@ -355,12 +421,12 @@ void SparseSolver < T, MultStore, InvStore > ::prepare() const
 {
 	if (store_.mult.empty() )
 	{
-		store_.mult.load (A_);
+		store_.mult.import (A_);
 	}
 
 	if (store_.invert.empty() )
 	{
-		store_.invert.load (A_);
+		store_.invert.import (A_);
 	}
 }
 

@@ -98,11 +98,9 @@ bool test_sparse (FILE * f, int iters, bool mult, bool invert)
 		}
 	} else if (!memcmp(tag, "ELL ", 4)) {
 		if (size == 4) {
-			throw runtime_error("ELL not implemented yet\n");
-//			do_test_sparse < StoreELL < float > > (f, iters, mult, invert);
+			do_test_sparse < StoreELL < float > > (f, iters, mult, invert);
 		} else if (size == 8 && check_device_supports_double()) {
-			throw runtime_error("ELL not implemented yet\n");
-//			do_test_sparse < StoreELL < double > > (f, iters, mult, invert);
+			do_test_sparse < StoreELL < double > > (f, iters, mult, invert);
 		} else {
 			throw runtime_error("unsupported floating point format\n");
 		}
