@@ -54,14 +54,19 @@ void do_test_invert_sparse(const Solver & solver, FILE * f, int iters)
 
 	fprintf(stderr, "invert: n:%d, nz:%d\n", n, nz);
 	Timer t;
+	for (int i = 0; i < 1; ++i) {
+		rp[i] = 1.0;
+		solver.solve(&ans[0], &rp[0]);
+	}
+
 #pragma omp parallel for
-	for (int i = 0; i < n; ++i) {
+	for (int i = 1; i < n; ++i) {
 		rp[i] = 1.0;
 		solver.solve(&ans[0], &rp[0]);
 	}
 
 	double seconds = t.elapsed();
-	fprintf(stderr, "mult: %.16lfs\n", seconds);
+	fprintf(stderr, "invert: %.16lfs\n", seconds);
 }
 
 template < typename Store >
