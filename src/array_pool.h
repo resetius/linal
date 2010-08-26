@@ -7,9 +7,10 @@ template < typename T >
 class ArrayPool
 {
 	typedef std::list < T > allocated_t;
+	typedef std::list < typename allocated_t::iterator > checkpoints_t;
 	allocated_t allocated;
+	checkpoints_t checkpoints;
 	typename allocated_t::iterator it;
-	typename allocated_t::iterator cp;
 	int n;
 
 public:
@@ -35,14 +36,17 @@ public:
 	{
 		if (it == allocated.end())
 		{
-			if (cp == allocated.end()) {
-				allocated.push_back(T(n));
-				cp = allocated.end();
-				--cp;
-			} else {
-				allocated.push_back(T(n));
-			}
+			typename allocated_t::iterator prev;
+			allocated.push_back(T(n));
 			it = allocated.end();
+			prev = it; --prev;
+			for (typename checkpoints_t::iterator i = checkpoints.begin();
+			     i != checkpoints.end(); ++i)
+			{
+				if (*i == allocated.end()) {
+					*i = prev;
+				}
+			}
 			return allocated.back();
 		}
 
@@ -51,12 +55,13 @@ public:
 
 	void checkpoint()
 	{
-		cp = it;
+		checkpoints.push_back(it);
 	}
 
 	void rollback()
 	{
-		it = cp;
+		it = checkpoints.back();
+		checkpoints.pop_back();
 	}
 };
 
