@@ -36,7 +36,8 @@ public:
 	                  const void * hint = 0)
 	{
 		pointer ret = 0;
-		if (cublasAlloc((int)size, sizeof(T), (void**)&ret) != CUBLAS_STATUS_SUCCESS)
+		cudaError_t status = cudaMalloc ((void**)&ret, size * sizeof(T));
+		if (status != cudaSuccess)
 		{
 			throw std::bad_alloc();
 			return 0;
@@ -48,7 +49,7 @@ public:
 
 	void deallocate (pointer p, size_type n)
 	{
-		cublasFree(p);
+		cudaFree(p);
 	}
 
 	size_type max_size() const throw()
