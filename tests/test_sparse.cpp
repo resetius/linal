@@ -80,7 +80,11 @@ void do_test_sparse(FILE * f, int iters, bool mult, bool invert)
 	}
 
 	if (invert) {
+#ifdef UMFPACK
 		do_test_invert_sparse(make_umfpack_solver(store, store), f, iters);
+#else
+		do_test_invert_sparse(make_sparse_solver(store, store), f, iters);
+#endif
 	}
 }
 
