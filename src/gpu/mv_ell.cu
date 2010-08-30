@@ -69,10 +69,14 @@ ell_mult_vector_r(float * r, const int * Ai, const float * Ax,
 {
 	SPLAY2(n);
 
-	texture_reader(texX1) XR(x, n);
-	texture_reader(texAX) AXR(Ax, cols * stride);
-	texture_reader(texAI) AIR(Ai, cols * stride);
-	
+//	texture_reader(texX1) XR(x, n);
+//	texture_reader(texAX) AXR(Ax, cols * stride);
+//	texture_reader(texAI) AIR(Ai, cols * stride);
+
+	simple_reader < float > XR(x);
+	simple_reader < float > AXR(Ax);
+	simple_reader < int > AIR(Ai);
+
 	ell_mult<<<blocks, threads>>>(r, AIR, AXR, XR, n, cols, stride);
 }
 
