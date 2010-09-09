@@ -26,6 +26,7 @@ if (NOT BLAS_FOUND)
 	mv_dense.cpp
 	mv_dense.h
 	mm_dense.cpp
+	mm_dense.h
 	)
 else ()
 	set(BLAS blas_wrapper.cpp)

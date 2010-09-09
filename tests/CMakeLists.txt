@@ -11,7 +11,8 @@ target_link_libraries(la_test_sparse ${LINAL_LIBS})
 
 add_definitions(-DTEST)
 add_executable(la_test_lu ../src/lu_solve.cpp)
-add_executable(la_test_mm_dense ../src/mm_dense.cpp ../src/timer.cpp)
+add_executable(la_test_mm_dense test_mm_dense.cpp)
+target_link_libraries(la_test_mm_dense ${LINAL_LIBS})
 
 if (OPENMP_FOUND)
 	set_target_properties(la_test_solver PROPERTIES LINK_FLAGS ${OpenMP_C_FLAGS})

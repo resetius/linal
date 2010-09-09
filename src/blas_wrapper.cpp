@@ -45,6 +45,13 @@ extern "C"
 			const double * x, long *, const double *beta, double *y, long *one);
 	void sgemv_(char *trans, long *, long *, const float *alpha, const float *A, long *, 
 			const float * x, long *, const float *beta, float *y, long *one);
+
+	void dgemm_ (char *, char *, long *, long *, long *, const double *beta, 
+			const double *A, long *, const double *B, long *, const double *alpha, 
+			double *C, long *);
+	void sgemm_ (char *, char *, long *, long *, long *, const float *beta, 
+			const float *A, long *, const float *B, long *, const float *alpha, 
+			float *C, long *);
 }
 
 namespace linal
@@ -179,6 +186,24 @@ void mat_mult_vector(float*y, float const*A, float const*x, int n)
 	sgemv_(&trans, &n1, &n1, &alpha, A, &n1, x, &one, &beta, y, &one);
 }
 
+/* level 3*/
+void mat_mult_mat(double*C, double const*A, double const*B, int n1)
+{
+	long n = n1;
+	char c = 'T';
+	double alpha = 0.0;
+	double beta = 1.0;
+	dgemm_ (&c, &c, &n, &n, &n, &beta, A, &n, B, &n, &alpha, C, &n);
+}
+
+void mat_mult_mat(float*C, const float*A, const float*B, int n1)
+{
+	long n = n1;
+	char c = 'T';
+	float alpha = 0.0;
+	float beta = 1.0;
+	sgemm_ (&c, &c, &n, &n, &n, &beta, A, &n, B, &n, &alpha, C, &n);
+}
 
 } /* namespace linal */
 
