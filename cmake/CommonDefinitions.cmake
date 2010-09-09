@@ -14,3 +14,7 @@ endif ()
 list(APPEND LINAL_LIBS linal)
 list(APPEND LINAL_DEFINES -DSPARSE)
 
+if (BLAS_FOUND)
+	list(APPEND LINAL_LIBS ${BLAS_LIBRARIES})
+endif ()
+

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.0)
-project(linal CXX C)
+project(linal Fortran CXX C)
 
 set (LINAL_INCLUDE "")
 set (LINAL_DEFINES "")
@@ -14,6 +14,7 @@ find_package(SelfUmfPack)
 find_package(UmfPack)
 find_package(SelfSuperLU)
 find_package(CUDA)
+find_package(BLAS)
 include(CommonDefinitions)
 
 if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR) # <- NOT root project

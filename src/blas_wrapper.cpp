@@ -35,23 +35,20 @@ extern "C"
 	void daxpy_(long *n, const double * alpha, const double * x, long *incx, double *y, long *incy);
 	void saxpy_(long *n, const float * alpha, const float * x, long *incx, float *y, long *incy);
 
-	void ddot_(long *n, const double *x, long *incx, const double *y, long *incy);
-	void sdot_(long *n, const float *x, long *incx, const float *y, long *incy);
+	double ddot_(long *n, const double *x, long *incx, const double *y, long *incy);
+	float sdot_(long *n, const float *x, long *incx, const float *y, long *incy);
+
+	void dscal_(long *n1, const double * k, double * a, long * one);
+	void sscal_(long *n1, const float * k, float * a, long * one);
+
+	void dgemv_(char *trans, long *, long *, const double *alpha, const double *A, long *, 
+			const double * x, long *, const double *beta, double *y, long *one);
+	void sgemv_(char *trans, long *, long *, const float *alpha, const float *A, long *, 
+			const float * x, long *, const float *beta, float *y, long *one);
 }
 
 namespace linal
 {
-
-/**
- * r = k1 * a + k2 * b
- */
-void vec_sum1 (double * r, const double * a, const double *b, double k1, double k2, int n)
-{
-}
-
-void vec_sum1 (float * r, const float * a, const float *b, float k1, float k2, int n)
-{
-}
 
 /**
  * r = a + k2 * b
@@ -65,7 +62,7 @@ void vec_sum2 (double * r, const double * a, const double *b, double k2, int n)
 		daxpy_(&n1, &alpha, b, &one, r, &one);
 	} else {
 		dcopy_(&n1, a, &one, r, &one);
-		vec_sum(r, r, b, n);
+		vec_sum2(r, r, b, k2, n);
 	}
 }
 
@@ -78,10 +75,13 @@ void vec_sum2 (float * r, const float * a, const float *b, float k2, int n)
 		saxpy_(&n1, &alpha, b, &one, r, &one);
 	} else {
 		scopy_(&n1, a, &one, r, &one);
-		vec_sum(r, r, b, n);
+		vec_sum2(r, r, b, k2, n);
 	}
 }
 
+/**
+ * r = k1 * a + k2 * b
+ */
 void vec_sum (double * r, const double * a, const double *b, int n)
 {
 	vec_sum2(r, a, b, 1.0, n);
@@ -102,8 +102,8 @@ void vec_mult_scalar (double * a, const double * b, double k, int n)
 	if (a == b) {
 		dscal_(&n1, &k, a, &one);
 	} else {
-		dcopy_(&n1, a, &one, r, &one);
-		vec_mult_scalar(a, b, k, n);
+		dcopy_(&n1, b, &one, a, &one);
+		vec_mult_scalar(a, a, k, n);
 	}
 }
 
@@ -114,17 +114,24 @@ void vec_mult_scalar (float * a, const float * b, float k, int n)
 	if (a == b) {
 		sscal_(&n1, &k, a, &one);
 	} else {
-		scopy_(&n1, a, &one, r, &one);
-		vec_mult_scalar(a, b, k, n);
+		scopy_(&n1, b, &one, a, &one);
+		vec_mult_scalar(a, a, k, n);
 	}
 }
 
-void vec_mult (double * r, const double * a, const double *b, int n)
+/**
+ * r = k1 * a + k2 * b
+ */
+void vec_sum1 (double * r, const double * a, const double *b, double k1, double k2, int n)
 {
+	vec_mult_scalar(r, a, k1, n);
+	vec_sum2(r, r, b, k2, n);
 }
 
-void vec_mult (float * r, const float * a, const float *b, int n)
+void vec_sum1 (float * r, const float * a, const float *b, float k1, float k2, int n)
 {
+	vec_mult_scalar(r, a, k1, n);
+	vec_sum2(r, r, b, k2, n);
 }
 
 /**
@@ -153,6 +160,25 @@ float vec_scalar2 (const float * a, const float * b, int n)
 	long n1  = n;
 	return sdot_(&n1, a, &one, b, &one);
 }
+
+/* level 2*/
+
+void mat_mult_vector(double*y, double const*A, double const*x, int n)
+{
+	char trans = 'T';
+	long n1 = n, one = 1;
+	double alpha = 1.0, beta = 0.0;
+	dgemv_(&trans, &n1, &n1, &alpha, A, &n1, x, &one, &beta, y, &one);
+}
+
+void mat_mult_vector(float*y, float const*A, float const*x, int n)
+{
+	char trans = 'T';
+	long n1 = n, one = 1;
+	float alpha = 1.0, beta = 0.0;
+	sgemv_(&trans, &n1, &n1, &alpha, A, &n1, x, &one, &beta, y, &one);
+}
+
 
 } /* namespace linal */
 

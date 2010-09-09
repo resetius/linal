@@ -27,13 +27,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <math.h>
-#include <stdio.h>
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
-#include <float.h>
-
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -87,27 +80,6 @@ void vec_sum2 (double * r, const double * a, const double *b, double k2, int n)
 void vec_sum2 (float * r, const float * a, const float *b, float k2, int n)
 {
 	vec_sum2_ (r, a, b, k2, n);
-}
-
-template < typename T >
-void vec_sum_ (T * r, const T * a, const T *b, int n)
-{
-	int i;
-#pragma omp parallel for
-	for (i = 0; i < n; ++i)
-	{
-		r[i] = a[i] + b[i];
-	}
-}
-
-void vec_sum (double * r, const double * a, const double *b, int n)
-{
-	vec_sum_ (r, a, b, n);
-}
-
-void vec_sum (float * r, const float * a, const float *b, int n)
-{
-	vec_sum_ (r, a, b, n);
 }
 
 /**
