@@ -97,10 +97,26 @@ void vec_sum (float * r, const float * a, const float *b, int n)
  */
 void vec_mult_scalar (double * a, const double * b, double k, int n)
 {
+	long n1  = n;
+	long one = 1;
+	if (a == b) {
+		dscal_(&n1, &k, a, &one);
+	} else {
+		dcopy_(&n1, a, &one, r, &one);
+		vec_mult_scalar(a, b, k, n);
+	}
 }
 
 void vec_mult_scalar (float * a, const float * b, float k, int n)
 {
+	long n1  = n;
+	long one = 1;
+	if (a == b) {
+		sscal_(&n1, &k, a, &one);
+	} else {
+		scopy_(&n1, a, &one, r, &one);
+		vec_mult_scalar(a, b, k, n);
+	}
 }
 
 void vec_mult (double * r, const double * a, const double *b, int n)
