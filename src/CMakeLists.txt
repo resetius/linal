@@ -20,13 +20,20 @@ set(SOURCE
 	impl/solver_superlu.h
 	)
 
+set(BLAS
+	blas.cpp
+	mv_dense.cpp
+	mv_dense.h
+	mm_dense.cpp
+	)
+
 add_library(linal
 	${SOURCE}
+	${BLAS}
 	linal.cpp
 	lu_solve.cpp
 	lu_solve.h
-	mv_dense.cpp
-	mv_dense.h
+	add_csr.cpp
 	mv_csr.cpp
 	mv_csr.h
 	mv_ell.cpp
