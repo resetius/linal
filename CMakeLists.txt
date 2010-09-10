@@ -14,6 +14,8 @@ find_package(SelfUmfPack)
 find_package(UmfPack)
 find_package(SelfSuperLU)
 find_package(CUDA)
+# set(BLA_VENDOR Intel10_64lp)
+# set(BLA_VENDOR ACML)
 find_package(BLAS)
 include(CommonDefinitions)
 
@@ -27,6 +29,8 @@ endif ()
 if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/settings.cmake")
 	include(${CMAKE_CURRENT_BINARY_DIR}/settings.cmake)
 endif()
+
+message("blas -> ${BLAS_LIBRARIES}")
 
 add_subdirectory(contrib)
 add_subdirectory(src)
