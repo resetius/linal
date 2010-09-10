@@ -30,7 +30,9 @@ if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/settings.cmake")
 	include(${CMAKE_CURRENT_BINARY_DIR}/settings.cmake)
 endif()
 
-message("blas -> ${BLAS_LIBRARIES}")
+if (BLAS_FOUND)
+	message(STATUS "BLAS: ${BLAS_LIBRARIES}")
+endif ()
 
 add_subdirectory(contrib)
 add_subdirectory(src)
