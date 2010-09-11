@@ -27,24 +27,32 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 namespace linal
 {
 
-int check_device_supports_double()
+template < typename T >
+void vec_mult_ (T * r, const T * a, const T *b, int n)
 {
-	return 1;
+	int i;
+#pragma omp parallel for
+	for (i = 0; i < n; ++i)
+	{
+		r[i] = a[i] * b[i];
+	}
 }
 
-void linal_init()
+void vec_mult (double * r, const double * a, const double *b, int n)
 {
+	vec_mult_ (r, a, b, n);
 }
 
-void linal_shutdown()
+void vec_mult (float * r, const float * a, const float *b, int n)
 {
-}
-
-void linal_sync()
-{
+	vec_mult_ (r, a, b, n);
 }
 
 } /* namespace linal */

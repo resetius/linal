@@ -20,13 +20,26 @@ set(SOURCE
 	impl/solver_superlu.h
 	)
 
+if (NOT BLAS_FOUND)
+	set(BLAS
+	blas.cpp
+	mv_dense.cpp
+	mv_dense.h
+	mm_dense.cpp
+	mm_dense.h
+	)
+else ()
+	set(BLAS blas_wrapper.cpp)
+endif ()
+
 add_library(linal
 	${SOURCE}
+	${BLAS}
+	noblas.cpp
 	linal.cpp
 	lu_solve.cpp
 	lu_solve.h
-	mv_dense.cpp
-	mv_dense.h
+	add_csr.cpp
 	mv_csr.cpp
 	mv_csr.h
 	mv_ell.cpp

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.0)
-project(linal CXX C)
+project(linal Fortran CXX C)
 
 set (LINAL_INCLUDE "")
 set (LINAL_DEFINES "")
@@ -14,6 +14,9 @@ find_package(SelfUmfPack)
 find_package(UmfPack)
 find_package(SelfSuperLU)
 find_package(CUDA)
+# set(BLA_VENDOR Intel10_64lp)
+# set(BLA_VENDOR ACML)
+find_package(BLAS)
 include(CommonDefinitions)
 
 if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR) # <- NOT root project
@@ -26,6 +29,10 @@ endif ()
 if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/settings.cmake")
 	include(${CMAKE_CURRENT_BINARY_DIR}/settings.cmake)
 endif()
+
+if (BLAS_FOUND)
+	message(STATUS "BLAS: ${BLAS_LIBRARIES}")
+endif ()
 
 add_subdirectory(contrib)
 add_subdirectory(src)

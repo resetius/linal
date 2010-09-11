@@ -339,6 +339,7 @@ void set_num_threads (int threads);
 
 } /* namespace */
 
+#include "mm_dense.h"
 #include "mv_dense.h"
 #include "mv_csr.h"
 #include "mv_ell.h"
