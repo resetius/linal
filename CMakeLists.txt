@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.0)
-project(linal Fortran CXX C)
+project(linal CXX C)
 
 set (LINAL_INCLUDE "")
 set (LINAL_DEFINES "")
