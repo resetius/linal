@@ -130,27 +130,6 @@ void vec_mult_scalar (float * a, const float * b, float k, int n)
 	vec_mult_scalar_ (a, b, k, n);
 }
 
-template < typename T >
-void vec_mult_ (T * r, const T * a, const T *b, int n)
-{
-	int i;
-#pragma omp parallel for
-	for (i = 0; i < n; ++i)
-	{
-		r[i] = a[i] * b[i];
-	}
-}
-
-void vec_mult (double * r, const double * a, const double *b, int n)
-{
-	vec_mult_ (r, a, b, n);
-}
-
-void vec_mult (float * r, const float * a, const float *b, int n)
-{
-	vec_mult_ (r, a, b, n);
-}
-
 /**
  * r = a - b
  */
