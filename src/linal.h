@@ -122,6 +122,14 @@ void mat_print (FILE * f, const float * A, int n, int m, const char * fmt);
 void mat_print (const char * f, const float * A, int n, int m, const char * fmt);
 
 /**
+ * Load NxM matrix from file.
+ */
+void mat_load (FILE * f, std::vector < double > & A, int * n, int * m);
+void mat_load (const char * f, std::vector < double > & A, int * n, int * m);
+void mat_load (FILE * f, std::vector < float > & A, int * n, int * m);
+void mat_load (const char * f, std::vector < float > & A, int * n, int * m);
+
+/**
  * Print vector to file.
  * @param A - vector
  * @param n - dimension

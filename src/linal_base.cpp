@@ -34,11 +34,15 @@
 #include <string.h>
 #include <float.h>
 
+#include <vector>
+
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
 #include "linal.h"
+
+using namespace std;
 
 namespace linal
 {
@@ -229,6 +233,190 @@ void mat_print (const char * fn, const double * A, int n, int m, const char * fm
 	if (!f) return;
 	mat_print_ (f, A, n, m, fmt);
 	fclose (f);
+}
+
+#define LT_MIN_SIZE 128
+static char * _fget_long_string(FILE *f, const char * separator, int *len)
+{
+	char * buf = (char*)malloc(LT_MIN_SIZE);
+	char * str = (char*)malloc(LT_MIN_SIZE);
+	char *nstr = 0;
+	int c = 0, i = 0, j = 0;
+	int count;
+	int sep = strlen(separator);
+
+	str[0] = 0;
+	i      = 0;
+	while (1)
+	{
+		c = fread(buf, 1, LT_MIN_SIZE, f);
+		if (c <= sep && i == 0) {
+			free(str); free(buf);
+			return 0;
+		}
+		count = 0;
+		while (count < (c - sep)) {
+			int flag = 1;
+			for (j = 0; j < sep; j++) {
+				if (buf[count + j] != separator[j]) {
+					flag = 0;
+					break;
+				}
+			}
+			if (flag)
+				break;
+			++count;
+		}
+
+		memcpy(&str[i * LT_MIN_SIZE], buf, c);
+		if (count < (c - sep) || (feof(f) && count == (c - sep))) 
+		{
+			fseek(f, count - c + sep, SEEK_CUR);
+			str[i * LT_MIN_SIZE + count] = 0;
+			if (len)
+				*len = i * LT_MIN_SIZE + count;
+			break;
+		}
+		nstr = (char*)realloc(str, (i + 2) * LT_MIN_SIZE);
+		if (nstr) {
+			str = nstr;
+		} else {
+			str[i * LT_MIN_SIZE - 1] = 0;
+			if (len)
+				*len = 0;
+			break;
+		}
+		++i;
+	}
+	free(buf);
+	return str;
+}
+
+static char * fget_long_string(FILE *f)
+{
+	return _fget_long_string(f, "\n", 0);
+}
+
+static void load_matrix_from_txtfile_(double **A, int *n, int *m, FILE * f)
+{
+	double * vec = (double*)malloc(LT_MIN_SIZE * sizeof(double));
+	double * M   = 0;
+	double *nvec = 0;
+	double a;
+	char * str;
+	int pos = 0, i = 0;
+	int size, len;
+	char * token;
+	char * sep = " \t\r\n";
+
+	/*число столбцов матрицы равно числу чисел первой строки*/
+	str  = fget_long_string(f);
+	if (str == 0) {
+		*A = 0; *n = 0; *m = 0;
+		free(vec);
+		fclose(f);
+		return;
+	}
+
+	len  = strlen(str);
+	size = LT_MIN_SIZE;
+	i    = 0;
+	pos  = 0;
+
+	token = strtok(str, sep);
+	while (token) {
+		if (sscanf(token, "%lf", &a) == 1) {
+			if (i >= size) {
+				size = 2 * size;
+				nvec = (double*)realloc(vec, size * sizeof(double));
+				if (nvec) {
+					vec = nvec;
+				} else {
+					break;
+				}
+			}
+			vec[i++] = a;
+		}
+		token = strtok(0, sep);
+	}
+
+	*m = i;
+	free(str);
+
+	M = (double*)malloc(*m * sizeof(double));
+	memcpy(M, vec, *m * sizeof(double));
+
+	*n = 1;
+	while (1) {
+		str  = fget_long_string(f);
+		if (str == 0)
+			break;
+		len  = strlen(str);
+		i    = 0;
+		pos  = 0;
+		token= strtok(str, sep);
+		while (token && i < *m) {
+			if (sscanf(token, "%lf", &a) == 1) {
+				vec[i++] = a;
+			}
+			token = strtok(0, sep);
+		}
+		free(str);
+
+		if (i < *m)
+			continue;
+
+		nvec = (double*)realloc(M, *m * (*n + 1) * sizeof(double));		
+		if (nvec) {
+			M = nvec;
+			memcpy(&M[*n * *m], vec, *m * sizeof(double));
+		} else {
+			break;
+		}
+		++(*n);
+		if (feof(f))
+			break;
+	}
+
+	*A = M;
+	free(vec);
+}
+
+template < typename T >
+void mat_load_ (FILE * f, std::vector < T > & A, int * n, int * m)
+{
+	double * A1;
+	load_matrix_from_txtfile_(&A1, n, m, f);
+	if (A1) {
+		A.resize(*n * *m);
+		memcpy(&A[0], A1, *n * *m * sizeof(T));
+	}
+}
+
+void mat_load (FILE * f, std::vector < double > & A, int * n, int * m)
+{
+	mat_load_(f, A, n, m);
+}
+
+void mat_load (FILE * f, std::vector < float > & A, int * n, int * m)
+{
+	mat_load_(f, A, n, m);
+}
+
+void mat_load (const char * fn, std::vector < double > & A, int * n, int * m)
+{
+	FILE * f = fopen (fn, "rb");
+	if (!f) return;
+	mat_load_(f, A, n, m);
+	fclose(f);
+}
+
+void mat_load (const char * fn, std::vector < float > & A, int * n, int * m)
+{
+	FILE * f = fopen (fn, "rb");
+	if (!f) return;
+	mat_load_(f, A, n, m);
+	fclose(f);
 }
 
 double vec_norm2 (const double * v, int n)
