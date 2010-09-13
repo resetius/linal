@@ -139,7 +139,12 @@ void vec_mult_scalar (float * a, const float * b, float k, int n)
  */
 void vec_sum1 (double * r, const double * a, const double *b, double k1, double k2, int n)
 {
-	if (r == b) {
+	if (r == a && r == a) {
+		long n1  = n;
+		long one = 1;
+		double k = k1 + k2;
+		dscal_(&n1, &k, r, &one);
+	} else if (r == b) {
 		vec_sum1(r, b, a, k2, k1, n);
 	} else {
 		vec_mult_scalar(r, a, k1, n);
@@ -149,7 +154,12 @@ void vec_sum1 (double * r, const double * a, const double *b, double k1, double 
 
 void vec_sum1 (float * r, const float * a, const float *b, float k1, float k2, int n)
 {
-	if (r == b) {
+	if (r == a && r == a) {
+		long n1  = n;
+		long one = 1;
+		float k  = k1 + k2;
+		sscal_(&n1, &k, r, &one);
+	} if (r == b) {
 		vec_sum1(r, b, a, k2, k1, n);
 	} else {
 		vec_mult_scalar(r, a, k1, n);
