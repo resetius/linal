@@ -64,9 +64,13 @@ void vec_sum2 (double * r, const double * a, const double *b, double k2, int n)
 {
 	long n1 = n;
 	long one = 1;
-	double alpha = k2;
+	double alpha  = k2;
+	double alpha1 = 1.0;
 	if (r == a) {
 		daxpy_(&n1, &alpha, b, &one, r, &one);
+	} else if (r == b) {
+		dscal_(&n1, &k2, r, &one);
+		daxpy_(&n1, &alpha1, a, &one, r, &one);
 	} else {
 		dcopy_(&n1, a, &one, r, &one);
 		vec_sum2(r, r, b, k2, n);
@@ -77,9 +81,13 @@ void vec_sum2 (float * r, const float * a, const float *b, float k2, int n)
 {
 	long n1 = n;
 	long one = 1;
-	float alpha = k2;
+	float alpha  = k2;
+	float alpha1 = 1.0;
 	if (r == a) {
 		saxpy_(&n1, &alpha, b, &one, r, &one);
+	} else if (r == b) {
+		sscal_(&n1, &k2, r, &one);
+		saxpy_(&n1, &alpha1, a, &one, r, &one);
 	} else {
 		scopy_(&n1, a, &one, r, &one);
 		vec_sum2(r, r, b, k2, n);
@@ -131,14 +139,22 @@ void vec_mult_scalar (float * a, const float * b, float k, int n)
  */
 void vec_sum1 (double * r, const double * a, const double *b, double k1, double k2, int n)
 {
-	vec_mult_scalar(r, a, k1, n);
-	vec_sum2(r, r, b, k2, n);
+	if (r == b) {
+		vec_sum1(r, b, a, k2, k1, n);
+	} else {
+		vec_mult_scalar(r, a, k1, n);
+		vec_sum2(r, r, b, k2, n);
+	}
 }
 
 void vec_sum1 (float * r, const float * a, const float *b, float k1, float k2, int n)
 {
-	vec_mult_scalar(r, a, k1, n);
-	vec_sum2(r, r, b, k2, n);
+	if (r == b) {
+		vec_sum1(r, b, a, k2, k1, n);
+	} else {
+		vec_mult_scalar(r, a, k1, n);
+		vec_sum2(r, r, b, k2, n);
+	}
 }
 
 /**

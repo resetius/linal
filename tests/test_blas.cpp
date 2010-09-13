@@ -23,7 +23,7 @@ int main()
 
 	for (int i = 0; i < n; ++i) {
 		if (fabs(c[i] - 3) > 1e-15) {
-			fprintf(stderr, "vec_sum failed\n");
+			fprintf(stderr, "1: vec_sum failed\n");
 			return -1;
 		}
 	}
@@ -33,7 +33,7 @@ int main()
 
 	for (int i = 0; i < n; ++i) {
 		if (fabs(a[i] - 3) > 1e-15) {
-			fprintf(stderr, "vec_sum failed\n");
+			fprintf(stderr, "2: vec_sum failed\n");
 			return -1;
 		}
 	}
@@ -43,7 +43,27 @@ int main()
 
 	for (int i = 0; i < n; ++i) {
 		if (fabs(c[i] - (-9)) > 1e-15) {
-			fprintf(stderr, "vec_sum2 failed\n");
+			fprintf(stderr, "1: vec_sum2 failed\n");
+			return -1;
+		}
+	}
+
+	init_a_b(&a[0], &b[0], n);
+	vec_sum2(&a[0], &a[0], &b[0], -5, n);
+
+	for (int i = 0; i < n; ++i) {
+		if (fabs(a[i] - (-9)) > 1e-15) {
+			fprintf(stderr, "2: vec_sum2 failed\n");
+			return -1;
+		}
+	}
+
+	init_a_b(&a[0], &b[0], n);
+	vec_sum2(&a[0], &b[0], &a[0], 1, n);
+
+	for (int i = 0; i < n; ++i) {
+		if (fabs(a[i] - (3)) > 1e-15) {
+			fprintf(stderr, "3: vec_sum2 failed ->> %lf\n", a[i]);
 			return -1;
 		}
 	}
@@ -53,7 +73,7 @@ int main()
 
 	for (int i = 0; i < n; ++i) {
 		if (fabs(c[i] - (-1)) > 1e-15) {
-			fprintf(stderr, "vec_diff failed\n");
+			fprintf(stderr, "1: vec_diff failed\n");
 			return -1;
 		}
 	}
@@ -63,7 +83,7 @@ int main()
 
 	for (int i = 0; i < n; ++i) {
 		if (fabs(a[i] - (-1)) > 1e-15) {
-			fprintf(stderr, "vec_diff failed\n");
+			fprintf(stderr, "2: vec_diff failed\n");
 			return -1;
 		}
 	}
@@ -73,7 +93,7 @@ int main()
 
 	for (int i = 0; i < n; ++i) {
 		if (fabs(c[i] - (2)) > 1e-15) {
-			fprintf(stderr, "vec_mult failed\n");
+			fprintf(stderr, "1: vec_mult failed\n");
 			return -1;
 		}
 	}
@@ -83,7 +103,7 @@ int main()
 
 	for (int i = 0; i < n; ++i) {
 		if (fabs(c[i] - (-2)) > 1e-15) {
-			fprintf(stderr, "vec_sum1 failed\n");
+			fprintf(stderr, "1: vec_sum1 failed\n");
 			return -1;
 		}
 	}
@@ -93,7 +113,17 @@ int main()
 
 	for (int i = 0; i < n; ++i) {
 		if (fabs(a[i] - (-2)) > 1e-15) {
-			fprintf(stderr, "vec_sum1 failed\n");
+			fprintf(stderr, "2: vec_sum1 failed\n");
+			return -1;
+		}
+	}
+
+	init_a_b(&a[0], &b[0], n);
+	vec_sum1(&a[0], &b[0], &a[0], -2.0, 2.0, n);
+
+	for (int i = 0; i < n; ++i) {
+		if (fabs(a[i] - (-2)) > 1e-15) {
+			fprintf(stderr, "3: vec_sum1 failed\n");
 			return -1;
 		}
 	}
@@ -103,7 +133,7 @@ int main()
 
 	for (int i = 0; i < n; ++i) {
 		if (fabs(c[i] - (2)) > 1e-15) {
-			fprintf(stderr, "vec_mult_scalar failed\n");
+			fprintf(stderr, "1: vec_mult_scalar failed\n");
 			return -1;
 		}
 	}
@@ -113,7 +143,7 @@ int main()
 
 	for (int i = 0; i < n; ++i) {
 		if (fabs(a[i] - (2)) > 1e-15) {
-			fprintf(stderr, "vec_mult_scalar failed\n");
+			fprintf(stderr, "2: vec_mult_scalar failed\n");
 			return -1;
 		}
 	}
