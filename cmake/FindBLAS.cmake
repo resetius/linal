@@ -126,10 +126,10 @@ if (BLA_VENDOR STREQUAL "ATLAS" OR BLA_VENDOR STREQUAL "All")
   check_fortran_libraries(
   BLAS_LIBRARIES
   BLAS
-  cblas_dgemm
+  dgemm
   ""
-  "cblas;f77blas;atlas"
-  ""
+  "ptf77blas;atlas"
+  "-fopenmp"
   )
  endif(NOT BLAS_LIBRARIES)
 endif (BLA_VENDOR STREQUAL "ATLAS" OR BLA_VENDOR STREQUAL "All")
