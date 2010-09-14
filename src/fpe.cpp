@@ -5,7 +5,7 @@
 extern "C" void set_fpe_except()
 {
 	int cw = _controlfp (0, 0);
-	cw &= ~ (EM_OVERFLOW | EM_UNDERFLOW | EM_ZERODIVIDE | EM_DENORMAL);
+	cw &= ~ (EM_OVERFLOW | EM_UNDERFLOW | EM_ZERODIVIDE | EM_DENORMAL | EM_INVALID);
 	_controlfp (cw, MCW_EM);
 }
 #else
