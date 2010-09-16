@@ -55,6 +55,38 @@ float vec_scalar2(const float * a, const float * b, int n)
 }
 */
 
+/* level 3*/
+void mat_mult_mat(double*C, double const*A, double const*B, int n1)
+{
+	int n   = n1;
+	double alpha = 0.0;
+	double beta = 1.0;
+	cublasDgemm ('N', 'N', n, n, n, beta, A, n, B, n, alpha, C, n);
+/*
+	int status = cublasGetError();
+	if (status != CUBLAS_STATUS_SUCCESS)
+	{
+		exit(1);
+	}
+	*/
+}
+
+void mat_mult_mat(float*C, const float*A, const float*B, int n1)
+{
+	long n = n1;
+	char c = 'T';
+	float alpha = 0.0;
+	float beta = 1.0;
+	cublasSgemm (c, c, n, n, n, beta, A, n, B, n, alpha, C, n);
+/*
+	int status = cublasGetError();
+	if (status != CUBLAS_STATUS_SUCCESS)
+	{
+		exit(1);
+	}
+	*/
+}
+
 int check_device_supports_double()
 {
 	double pi1 = M_PI;

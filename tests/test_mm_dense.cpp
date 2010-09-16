@@ -45,51 +45,90 @@ using namespace std;
 using namespace linal;
 
 #define N 4096L
+//#define N 2L
 //#define CHECK
 
-int main()
+static void
+mat_mult_mat_stupid1(double * C, const double * A, const double * B, int n)
+{
+#pragma omp parallel for
+	for (int i = 0; i < n; ++i) {
+		for (int j = 0; j < n; ++j) {
+			double s = 0;
+			for (int k = 0; k < n; ++k) {
+				s += A[i * n + k] * B[k * n + j];
+			}
+			C[i * n + j] = s;
+		}
+	}
+}
+
+template < typename T >
+int do_all()
 {
 	int n = N;
-	vector < double > A(n * n);
-	vector < double > B(n * n);
-	vector < double > C(n * n);
-	vector < double > reference(n * n);
+	int iters = 1;
+
+	linal_init();
+
+	vector < T > Ah(n * n);
+	vector < T > Bh(n * n);
+	vector < T > Ch(n * n);
+	ArrayDevice < T > A(n * n);
+	ArrayDevice < T > B(n * n);
+	ArrayDevice < T > C(n * n);
+	vector < T > reference(n * n);
 
 	for (int i = 0; i < n; ++i) {
 		for (int j = 0; j < n; ++j) {
 			if (i > j) {
-				A[i * n + j] = 1. / (1. + i + j);
-				B[i * n + j] = (2. + i + j);
+				Ah[i * n + j] = 1. / (1. + i + j);
+				Bh[i * n + j] = (2. + i + j);
 			} else {
-				A[i * n + j] = -1. / (1. + i + j);
-				B[i * n + j] = -(2. + i + j);
+				Ah[i * n + j] = -1. / (1. + i + j);
+				Bh[i * n + j] = -(2. + i + j);
 			}
 		}
 	}
 
 	double t, seconds;
+	vec_copy_from_host(&A[0], &Ah[0], n * n);
+	vec_copy_from_host(&B[0], &Bh[0], n * n);
+#ifdef GPGPU
+	cudaThreadSynchronize();
+#endif
+	fprintf(stderr, "go!\n");
+
 	t = get_full_time();
 	//omp_set_num_threads(4);
-	mat_mult_mat(&C[0], &A[0], &B[0], n);
+	for (int i = 0; i < iters; ++i) {
+		mat_mult_mat(&C[0], &A[0], &B[0], n);
+	}
 	//mat_mult_mat_cannon(&C[0], &A[0], &B[0], n);
 	//mat_mult_mat1(&C[0], &A[0], &B[0], n);
 
+#ifdef GPGPU
+	cudaThreadSynchronize();
+#endif
 	seconds = (get_full_time() - t) / 100.0;
-	printf("t=%lf, gflops=%lf\n", seconds, 
-		1e-9 * 2.0 * (double)n * (double)n * (double)n / seconds);
+
+	vec_copy_from_device(&Ch[0], &C[0], n * n);
+	//vec_copy_from_device(&Ch[0], &A[0], n * n);
+	fprintf(stderr, "t=%lf, gflops=%lf\n", seconds, 
+		1e-9 * 2.0 * (double)n * (double)n * (double)n / seconds * iters);
 
 	// check
 
 #ifdef CHECK
 	t = get_full_time();
-	mat_mult_mat_stupid(&reference[0], &A[0], &B[0], n);
+	mat_mult_mat_stupid1(&reference[0], &Ah[0], &Bh[0], n);
 	seconds = (get_full_time() - t) / 100.0;
-	printf("t=%lf, gflops=%lf\n", seconds, 
+	fprintf(stderr, "t=%lf, gflops=%lf\n", seconds, 
 		1e-9 * 2.0 * (double)n * (double)n * (double)n / seconds);
 
 	for (int i = 0; i < n * n; ++i) {
-		if (fabs(reference[i] - C[i]) > 1e-7) {
-			printf("error ! \n %.16le != %.16le\n", reference[i], C[i]);
+		if (fabs(reference[i] - Ch[i]) > 1e-7) {
+			fprintf(stderr, "error ! \n %.16le != %.16le\n", reference[i], Ch[i]);
 			return -1;
 		}
 	}
@@ -97,6 +136,13 @@ int main()
 	printf("test passed!\n");
 #endif
 
+	linal_shutdown();
+
 	return 0;
 }
 
+int main()
+{
+	//do_all < double > ();
+	do_all < float > ();
+}

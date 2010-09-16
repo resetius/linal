@@ -201,9 +201,9 @@ void mat_print_ (FILE * f, const T * A, int n, int m, const char * fmt)
 {
 	for (int i = 0; i < n; ++i)
 	{
-		for (int j = 0; j < n; ++j)
+		for (int j = 0; j < m; ++j)
 		{
-			fprintf (f, fmt, A[i * n + j]);
+			fprintf (f, fmt, A[i * m + j]);
 		}
 		fprintf (f, "\n");
 	}

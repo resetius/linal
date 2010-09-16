@@ -34,10 +34,17 @@ if (CUDA_FOUND)
 	cuda_add_executable(la_test_sparse_cu test_sparse.cpp)
 	target_link_libraries(la_test_sparse_cu ${LINAL_CUDA_LIBS})
 	cuda_add_cublas_to_target(la_test_sparse_cu)
+	set_target_properties(la_test_sparse_cu PROPERTIES COMPILE_FLAGS "-DGPGPU")
+
+	cuda_add_executable(la_test_mm_dense_cu test_mm_dense.cpp)
+	target_link_libraries(la_test_mm_dense_cu ${LINAL_CUDA_LIBS})
+	cuda_add_cublas_to_target(la_test_mm_dense_cu)
+	set_target_properties(la_test_mm_dense_cu PROPERTIES COMPILE_FLAGS "-DGPGPU")
 
 	if (OPENMP_FOUND)
 		set_target_properties(la_test_gpu_reduction PROPERTIES LINK_FLAGS ${OpenMP_C_FLAGS})
 		set_target_properties(la_test_sparse_cu PROPERTIES LINK_FLAGS ${OpenMP_C_FLAGS})
+		set_target_properties(la_test_mm_dense_cu PROPERTIES LINK_FLAGS ${OpenMP_C_FLAGS})
 	endif (OPENMP_FOUND)
 
 	add_test(la_test_gpu_reduction ${EXECUTABLE_OUTPUT_PATH}/la_test_gpu_reduction)
