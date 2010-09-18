@@ -143,6 +143,6 @@ int do_all()
 
 int main()
 {
-	//do_all < double > ();
-	do_all < float > ();
+	do_all < double > ();
+	//do_all < float > ();
 }
