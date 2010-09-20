@@ -139,7 +139,7 @@ void vec_mult_scalar (float * a, const float * b, float k, int n)
  */
 void vec_sum1 (double * r, const double * a, const double *b, double k1, double k2, int n)
 {
-	if (r == a && r == a) {
+	if (r == a && r == b) {
 		long n1  = n;
 		long one = 1;
 		double k = k1 + k2;
@@ -154,7 +154,7 @@ void vec_sum1 (double * r, const double * a, const double *b, double k1, double 
 
 void vec_sum1 (float * r, const float * a, const float *b, float k1, float k2, int n)
 {
-	if (r == a && r == a) {
+	if (r == a && r == b) {
 		long n1  = n;
 		long one = 1;
 		float k  = k1 + k2;
