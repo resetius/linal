@@ -39,6 +39,9 @@
 # (To distributed this file outside of CMake, substitute the full
 #  License text for the above reference.)
 
+if (NOT _FIND_BLAS_)
+set (_FIND_BLAS_ TRUE)
+
 get_property(_LANGUAGES_ GLOBAL PROPERTY ENABLED_LANGUAGES)
 include(CheckFunctionExists)
 
@@ -460,3 +463,6 @@ else(BLA_F95)
     endif(BLAS_FOUND)
   endif(NOT BLAS_FIND_QUIETLY)
 endif(BLA_F95)
+
+endif ()
+

@@ -1,3 +1,6 @@
+if (NOT _LINAL_COMMON_DEFFINITION_)
+set (_LINAL_COMMON_DEFFINITION_ TRUE)
+
 if (MSVC)
         add_definitions(/D_CRT_SECURE_NO_WARNINGS)
 endif (MSVC)
@@ -16,5 +19,7 @@ list(APPEND LINAL_DEFINES -DSPARSE)
 
 if (BLAS_FOUND)
 	list(APPEND LINAL_LIBS ${BLAS_LIBRARIES})
+endif ()
+
 endif ()
 
