@@ -44,17 +44,17 @@
 using namespace std;
 using namespace linal;
 
-#define N 4096L
-//#define N 2L
-//#define CHECK
+//#define N 4096L
+#define N 2L
+#define CHECK
 
-static void
-mat_mult_mat_stupid1(double * C, const double * A, const double * B, int n)
+template < typename T > 
+void mat_mult_mat_stupid1(T* C, const T * A, const T * B, int n)
 {
 #pragma omp parallel for
 	for (int i = 0; i < n; ++i) {
 		for (int j = 0; j < n; ++j) {
-			double s = 0;
+			T s = 0;
 			for (int k = 0; k < n; ++k) {
 				s += A[i * n + k] * B[k * n + j];
 			}
@@ -121,7 +121,11 @@ int do_all()
 
 #ifdef CHECK
 	t = get_full_time();
+	mat_print(stderr, &Ah[0], n, n, "%8.3lf "); fprintf(stderr, "______\n");
+	mat_print(stderr, &Bh[0], n, n, "%8.3lf "); fprintf(stderr, "______\n");
+	mat_print(stderr, &Ch[0], n, n, "%8.3lf "); fprintf(stderr, "______\n");
 	mat_mult_mat_stupid1(&reference[0], &Ah[0], &Bh[0], n);
+	mat_print(stderr, &reference[0], n, n, "%8.3lf ");
 	seconds = (get_full_time() - t) / 100.0;
 	fprintf(stderr, "t=%lf, gflops=%lf\n", seconds, 
 		1e-9 * 2.0 * (double)n * (double)n * (double)n / seconds);
@@ -144,5 +148,5 @@ int do_all()
 int main()
 {
 	do_all < double > ();
-	//do_all < float > ();
+	do_all < float > ();
 }

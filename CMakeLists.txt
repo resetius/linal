@@ -8,6 +8,11 @@ set (LINAL_LIBS "")
 list(APPEND LINAL_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/settings.cmake")
+	include(${CMAKE_CURRENT_BINARY_DIR}/settings.cmake)
+endif()
+
 include(Common)
 find_package(OpenMP)
 find_package(SelfUmfPack)
@@ -25,10 +30,6 @@ set (LINAL_CUDA_LIBS ${LINAL_CUDA_LIBS} PARENT_SCOPE)
 set (LINAL_DEFINES ${LINAL_DEFINES} PARENT_SCOPE)
 set (LINAL_INCLUDE ${LINAL_INCLUDE} PARENT_SCOPE)
 endif ()
-
-if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/settings.cmake")
-	include(${CMAKE_CURRENT_BINARY_DIR}/settings.cmake)
-endif()
 
 if (BLAS_FOUND)
 	message(STATUS "BLAS: ${BLAS_LIBRARIES}")

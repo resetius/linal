@@ -216,19 +216,19 @@ void mat_mult_vector(float*y, float const*A, float const*x, int n)
 void mat_mult_mat(double*C, double const*A, double const*B, int n1)
 {
 	long n = n1;
-	char c = 'T';
+	char c = 'N';
 	double alpha = 0.0;
 	double beta = 1.0;
-	dgemm_ (&c, &c, &n, &n, &n, &beta, A, &n, B, &n, &alpha, C, &n);
+	dgemm_ (&c, &c, &n, &n, &n, &beta, B, &n, A, &n, &alpha, C, &n);
 }
 
 void mat_mult_mat(float*C, const float*A, const float*B, int n1)
 {
 	long n = n1;
-	char c = 'T';
+	char c = 'N';
 	float alpha = 0.0;
 	float beta = 1.0;
-	sgemm_ (&c, &c, &n, &n, &n, &beta, A, &n, B, &n, &alpha, C, &n);
+	sgemm_ (&c, &c, &n, &n, &n, &beta, B, &n, A, &n, &alpha, C, &n);
 }
 
 } /* namespace linal */

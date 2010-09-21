@@ -55,13 +55,13 @@ mat_mult_mat_stupid(double * C, const double * A, const double * B, int n)
 	}
 }
 
-void
-mat_mult_mat(double * C, const double * A, const double * B, int n)
+template < typename T >
+void mat_mult_mat_(T * C, const T * A, const T * B, int n)
 {
 #define block_dim 64
-	double As[block_dim][block_dim];
-	double Bs[block_dim][block_dim];
-	double Cs[block_dim][block_dim];
+	T As[block_dim][block_dim];
+	T Bs[block_dim][block_dim];
+	T Cs[block_dim][block_dim];
 
 	int blocks = (n + block_dim - 1) / block_dim;
 #undef block_dim
@@ -96,7 +96,7 @@ mat_mult_mat(double * C, const double * A, const double * B, int n)
 #pragma omp for schedule(static)
 			for (int i = 0; i < nll; ++i)
 			{
-				memcpy(&Cs[i][0], &C[(i + fl) * n + fm], nlm * sizeof(double));
+				memcpy(&Cs[i][0], &C[(i + fl) * n + fm], nlm * sizeof(T));
 			}
 
 			for (int k = 0; k < blocks; ++k)
@@ -110,13 +110,13 @@ mat_mult_mat(double * C, const double * A, const double * B, int n)
 #pragma omp for schedule(static)
 				for (int i = 0; i < nll; ++i)
 				{
-					memcpy(&As[i][0], &A[(i + fl) * n + fk], nlk * sizeof(double));
+					memcpy(&As[i][0], &A[(i + fl) * n + fk], nlk * sizeof(T));
 				}
 
 #pragma omp for schedule(static)
 				for (int i = 0; i < nlm; ++i)
 				{
-					memcpy(&Bs[i][0], &B[(i + fk) * n + fm], nlk * sizeof(double));
+					memcpy(&Bs[i][0], &B[(i + fk) * n + fm], nlk * sizeof(T));
 				}
 
 #pragma omp barrier
@@ -126,7 +126,7 @@ mat_mult_mat(double * C, const double * A, const double * B, int n)
 				{
 					for (int j = 0; j < nlm; ++j)
 					{
-						double s = 0.0;
+						T s = 0.0;
 						for (int k1 = 0; k1 < nlm; ++k1)
 						{
 							s += As[i][k1] * Bs[k1][j];
@@ -140,13 +140,23 @@ mat_mult_mat(double * C, const double * A, const double * B, int n)
 #pragma omp for schedule(static)
 			for (int i = 0; i < nll; ++i)
 			{
-				memcpy(&C[(i + fl) * n + fm], &Cs[i][0], nlm * sizeof(double));
+				memcpy(&C[(i + fl) * n + fm], &Cs[i][0], nlm * sizeof(T));
 			}
 #pragma omp barrier
 		}
 	}
 }
 
+}
+
+void mat_mult_mat(double * C, const double * A, const double * B, int n)
+{
+	mat_mult_mat_(C, A, B, n);
+}
+
+void mat_mult_mat(float * C, const float * A, const float * B, int n)
+{
+	mat_mult_mat_(C, A, B, n);
 }
 
 }
