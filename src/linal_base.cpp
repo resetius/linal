@@ -223,7 +223,9 @@ void mat_print (FILE * f, const double * A, int n, int m, const char * fmt)
 void mat_print (const char * fn, const float * A, int n, int m, const char * fmt)
 {
 	FILE * f = fopen (fn, "wb");
-	if (!f) return;
+	if (!f) {
+		throw runtime_error(string(fn) + string(" cannot open for writing"));
+	}
 	mat_print_ (f, A, n, m, fmt);
 	fclose (f);
 }
@@ -231,7 +233,9 @@ void mat_print (const char * fn, const float * A, int n, int m, const char * fmt
 void mat_print (const char * fn, const double * A, int n, int m, const char * fmt)
 {
 	FILE * f = fopen (fn, "wb");
-	if (!f) return;
+	if (!f) {
+		throw runtime_error(string(fn) + string(" cannot open for writing"));
+	}
 	mat_print_ (f, A, n, m, fmt);
 	fclose (f);
 }
