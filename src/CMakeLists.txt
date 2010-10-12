@@ -3,6 +3,9 @@ project(linal_src)
 include_directories(.)
 
 set(SOURCE
+	config.cpp
+	config.h
+
 	linal_base.cpp
 	linal.h
 
