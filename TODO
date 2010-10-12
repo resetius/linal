@@ -1,6 +1,7 @@
 2. parallel gmres version (important)
 3. invert sparse matrix (important)
 8. make mult_dense GPU version
+9. replace const char * -> string
 
 umfpack and blas bakend must have the same integer bitness !
 

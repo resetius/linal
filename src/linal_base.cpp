@@ -35,6 +35,7 @@
 #include <float.h>
 
 #include <vector>
+#include <stdexcept>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -406,7 +407,9 @@ void mat_load (FILE * f, std::vector < float > & A, int * n, int * m)
 void mat_load (const char * fn, std::vector < double > & A, int * n, int * m)
 {
 	FILE * f = fopen (fn, "rb");
-	if (!f) return;
+	if (!f) {
+		throw std::runtime_error(string(fn) + " notfound!");
+	}
 	mat_load_(f, A, n, m);
 	fclose(f);
 }
@@ -414,7 +417,9 @@ void mat_load (const char * fn, std::vector < double > & A, int * n, int * m)
 void mat_load (const char * fn, std::vector < float > & A, int * n, int * m)
 {
 	FILE * f = fopen (fn, "rb");
-	if (!f) return;
+	if (!f) {
+		throw std::runtime_error(string(fn) + " notfound!");
+	}
 	mat_load_(f, A, n, m);
 	fclose(f);
 }
