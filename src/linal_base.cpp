@@ -35,6 +35,7 @@
 #include <float.h>
 
 #include <vector>
+#include <string>
 #include <stdexcept>
 
 #ifdef _OPENMP
