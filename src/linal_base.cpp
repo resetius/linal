@@ -241,7 +241,7 @@ void mat_print (const char * fn, const double * A, int n, int m, const char * fm
 	fclose (f);
 }
 
-#define LT_MIN_SIZE 128
+#define LT_MIN_SIZE 65536
 static char * _fget_long_string(FILE *f, const char * separator, int *len)
 {
 	char * buf = (char*)malloc(LT_MIN_SIZE);
@@ -257,6 +257,7 @@ static char * _fget_long_string(FILE *f, const char * separator, int *len)
 	{
 		c = fread(buf, 1, LT_MIN_SIZE, f);
 		if (c <= sep && i == 0) {
+			//fprintf(stderr, "WARNING: fget_long_string %d %d\n", c, sep);
 			free(str); free(buf);
 			return 0;
 		}
@@ -355,8 +356,10 @@ static void load_matrix_from_txtfile_(double **A, int *n, int *m, FILE * f)
 	*n = 1;
 	while (1) {
 		str  = fget_long_string(f);
-		if (str == 0)
+		//fprintf(stderr, "read '%s'\n\n", str);
+		if (str == 0) {
 			break;
+		}
 		len  = strlen(str);
 		i    = 0;
 		pos  = 0;
@@ -369,8 +372,10 @@ static void load_matrix_from_txtfile_(double **A, int *n, int *m, FILE * f)
 		}
 		free(str);
 
-		if (i < *m)
+		if (i < *m) {
+			fprintf(stderr, "WARNING: mat_load: %d<%d on %d row\n",  i, *m, *n);
 			continue;
+		}
 
 		nvec = (double*)realloc(M, *m * (*n + 1) * sizeof(double));		
 		if (nvec) {
