@@ -73,6 +73,7 @@ void Config::load (FILE * f)
 	char buf[BUF_SZ];
 	char section[BUF_SZ];
 	const char * sep = " =\t";
+	char * comment;
 
 	section_t * cur = 0;
 
@@ -93,6 +94,11 @@ void Config::load (FILE * f)
 			char * k = 0, * v = 0;
 			if (buf[strlen(buf) - 1] == '\n') buf[strlen(buf) - 1] = 0;
 			if (buf[strlen(buf) - 1] == '\r') buf[strlen(buf) - 1] = 0;
+			comment = strstr(buf, ";");
+			if (comment) {
+				*comment = 0;
+			}
+
 			k = strtok (buf, sep);
 			v = strtok (0, sep);
 
