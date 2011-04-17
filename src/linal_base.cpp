@@ -314,7 +314,7 @@ static void load_matrix_from_txtfile_(double **A, int *n, int *m, FILE * f)
 	int pos = 0, i = 0;
 	int size, len;
 	char * token;
-	char * sep = " \t\r\n";
+	const char * sep = " \t\r\n";
 
 	/*число столбцов матрицы равно числу чисел первой строки*/
 	str  = fget_long_string(f);
