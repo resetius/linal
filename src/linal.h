@@ -186,17 +186,26 @@ void csr_add_matrix2 (const int * oAp, float * oAx,
                       const float * x, int n);
 
 /**
- * Print sparse matrix to file.
+ * Print CSR sparse matrix to file.
  * @param A - input sparse matrix
  * @param n - dimension of sparse matrix
  * @param f - output file
  */
-void sparse_print (const int * Ap, const int * Ai,
+void csr_print (const int * Ap, const int * Ai,
                    const double * Ax, int n, FILE * f);
 
-void sparse_print (const int * Ap, const int * Ai,
+void csr_print (const int * Ap, const int * Ai,
                    const float * Ax, int n, FILE * f);
 
+/**
+ * Print ELL sparse matrix to file.
+ * @param A - input sparse matrix
+ * @param n - dimension of sparse matrix
+ * @param f - output file
+ */
+void ell_print (const int * Ai, const double * Ax, int rows, int cols, int stride, FILE * f);
+
+void ell_print (const int * Ai, const float * Ax, int rows, int cols, int stride, FILE * f);
 
 /**
  * Linear combination of two vectors.

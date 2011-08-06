@@ -177,10 +177,7 @@ struct StoreELL
 		assert (0);
 	}
 
-	void print(FILE * f) const
-	{
-		// implement
-	}
+	void print(FILE * f) const;
 
 	void dump(FILE * f) const;
 	void restore(FILE * f);
@@ -220,7 +217,7 @@ struct DoubleStore
 
 	void restore(FILE * f)
 	{
-		throw std::runtime_error("restore not supported\n");
+		throw std::runtime_error("restore not supported");
 	}
 };
 
@@ -344,7 +341,7 @@ public:
 	/**
 	 * fill permanent storage from temporary storage
 	 */
-	void prepare() const;
+	void prepare(bool force = false) const;
 
 	void add_matrix1 (my_type & A, const T * vec);
 	void add_matrix2 (my_type & A, const T * vec);
@@ -407,7 +404,7 @@ public:
 	/**
 	 * Do nothing. For compatibility with sparse solvers.
 	 */
-	void prepare() {}
+	void prepare(bool) const {}
 };
 
 

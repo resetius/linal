@@ -27,6 +27,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdio.h>
+
 namespace linal
 {
 
@@ -37,6 +39,9 @@ int check_device_supports_double()
 
 void linal_init()
 {
+#ifdef WIN32
+	_set_output_format(_TWO_DIGIT_EXPONENT);
+#endif
 }
 
 void linal_shutdown()
