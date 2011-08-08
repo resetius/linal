@@ -52,6 +52,14 @@
 
 #undef SUPERLU
 
+#ifdef UMFPACK
+#include <umfpack.h>
+#endif
+
+#ifdef SUPERLU
+#include <slu_ddefs.h>
+#endif
+
 #include "linal.h"
 #include "gmres.h"
 
