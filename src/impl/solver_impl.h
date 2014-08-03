@@ -27,6 +27,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <algorithm>
+
 template < typename T, template < class > class Alloc >
 void StoreCSR < T, Alloc > ::import (const std::vector < row_t > & A)
 {

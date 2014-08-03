@@ -5,6 +5,7 @@
 #include <time.h>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 #include "gmres.h"
 #include "solver.h"

@@ -42,6 +42,7 @@
 
 #include <vector>
 #include <stdexcept>
+#include <algorithm>
 #include <map>
 
 #ifdef SPARSE
