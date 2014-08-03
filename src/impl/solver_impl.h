@@ -157,7 +157,7 @@ void StoreCSR < T, Alloc > ::print(FILE * f) const
 	array_copy(Ai, Ai_);
 	array_copy(Ap, Ap_);
 	array_copy(Ax, Ax_);
-	sparse_print(&Ap_[0], &Ai_[0], &Ax_[0], n_, f);
+	csr_print(&Ap_[0], &Ai_[0], &Ax_[0], n_, f);
 }
 
 template < typename T, template < class > class Alloc >
@@ -319,8 +319,8 @@ typename StoreELL < T, Alloc >::sparse_t StoreELL < T, Alloc > ::export_() const
 	{
 		for (int i0 = 0; i0 < cols_; i0++)
 		{
-			const T A_ij = Ax[stride_ * i0 + row];
-			const int col = Ai[stride_ * i0 + row];
+			T A_ij  = Ax[stride_ * i0 + row];
+			int col = Ai[stride_ * i0 + row];
 			ret[row][col] = A_ij;
 		}
 	}
@@ -331,6 +331,16 @@ template < typename T, template < class > class Alloc >
 void StoreELL < T, Alloc > ::mult (T * r, const T * x) const
 {
 	ell_mult_vector_r (r, &Ai_[0], &Ax_[0], x, n_, cols_, stride_);
+}
+
+template < typename T, template < class > class Alloc >
+void StoreELL < T, Alloc > ::print (FILE * f) const
+{
+	Array < int, std::allocator<int> > Ai;
+	Array < T, std::allocator<T> > Ax;
+	array_copy(Ai, Ai_);
+	array_copy(Ax, Ax_);
+	ell_print(&Ai[0], &Ax[0], n_, cols_, stride_, f);
 }
 
 template < typename T, template < class > class Alloc >
@@ -419,14 +429,14 @@ void SimpleSolver < T > ::print(FILE * f)
 }
 
 template < typename T, typename MultStore, typename InvStore  >
-void SparseSolver < T, MultStore, InvStore > ::prepare() const
+void SparseSolver < T, MultStore, InvStore > ::prepare(bool force) const
 {
-	if (store_.mult.empty() )
+	if (store_.mult.empty() || force)
 	{
 		store_.mult.import (A_);
 	}
 
-	if (store_.invert.empty() )
+	if (store_.invert.empty() || force)
 	{
 		store_.invert.import (A_);
 	}

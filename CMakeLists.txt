@@ -15,13 +15,13 @@ endif()
 
 include(Common)
 find_package(OpenMP)
+find_package(BLAS)
 find_package(SelfUmfPack)
 find_package(UmfPack)
 find_package(SelfSuperLU)
 find_package(CUDA)
 # set(BLA_VENDOR Intel10_64lp)
 # set(BLA_VENDOR ACML)
-find_package(BLAS)
 include(CommonDefinitions)
 
 if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR) # <- NOT root project

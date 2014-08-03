@@ -1,6 +1,4 @@
 
-#include <umfpack.h>
-
 /**
  * UMFPACK Solver class.
  */

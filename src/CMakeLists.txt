@@ -18,6 +18,7 @@ set(SOURCE
 
 	gmres.h
 
+	solver.h
 	impl/solver_impl.h
 	impl/solver_umfpack.h
 	impl/solver_superlu.h

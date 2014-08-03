@@ -495,30 +495,72 @@ void csr_print_ (const int * Ap, const int * Ai,
 			i = Ai[i0];
 			for (k = i_old; k < i - 1; ++k)
 			{
-				fprintf (f, "%8.3le ", 0.0);
+				fprintf (f, "%+8.3le ", 0.0);
 			}
-			fprintf (f, "%8.3le ", (double) *p);
+			fprintf (f, "%+8.3le ", (double) *p);
 			i_old = i;
 		}
 
 		for (k = i_old + 1; k < n; ++k)
 		{
-			fprintf (f, "%8.3le ", 0.0);
+			fprintf (f, "%+8.3le ", 0.0);
 		}
 		fprintf (f, "\n");
 	}
 }
 
-void sparse_print (const int * Ap, const int * Ai,
+void csr_print (const int * Ap, const int * Ai,
                    const double * Ax, int n, FILE * f)
 {
 	csr_print_ (Ap, Ai, Ax, n, f);
 }
 
-void sparse_print (const int * Ap, const int * Ai,
+void csr_print (const int * Ap, const int * Ai,
                    const float * Ax, int n, FILE * f)
 {
 	csr_print_ (Ap, Ai, Ax, n, f);
+}
+
+template < typename T >
+void ell_print_ (const int * Ai, const T * Ax, int n, int cols, int s, FILE * f)
+{
+	for (int row = 0; row < n; ++row) {
+		int old_col = -1;
+		int col     = 0;
+		for (int i0 = 0; i0 < cols; ++i0) {
+			if (old_col >= 0 && !Ai[s * i0 + row]) {
+				break;
+			}
+
+			T aij  = Ax[s * i0 + row];
+			col    = Ai[s * i0 + row];
+
+			for (int k = old_col + 1; k < col; ++k) 
+			{
+				fprintf(f, "%+8.3le ", 0.0);
+			}
+			
+			fprintf(f, "%+8.3le ", aij);
+			old_col = col;
+		}
+		
+		for (int k = col + 1; k < n; ++k) 
+		{
+			fprintf(f, "%+8.3le ", 0.0);
+		}
+		
+		fprintf(f, "\n");
+	}
+}
+
+void ell_print (const int * Ai, const double * Ax, int n, int cols, int s, FILE * f)
+{
+	ell_print_ (Ai, Ax, n, cols, s, f);
+}
+
+void ell_print (const int * Ai, const float * Ax, int n, int cols, int s, FILE * f)
+{
+	ell_print_ (Ai, Ax, n, cols, s, f);
 }
 
 } /* namespace */

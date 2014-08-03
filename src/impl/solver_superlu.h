@@ -1,4 +1,3 @@
-#include <slu_ddefs.h>
 
 extern "C" void
 sgstrf (superlu_options_t *options, SuperMatrix *A,
