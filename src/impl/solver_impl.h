@@ -487,9 +487,9 @@ void SparseSolver < T, MultStore, InvStore > ::restore(FILE * f)
 }
 
 template < typename T, typename MultStore, typename InvStore  >
-void SparseSolver < T, MultStore, InvStore > ::add (int i, int j, T a)
+void SparseSolver < T, MultStore, InvStore > ::add (int i, int j, double a)
 {
-	A_[i][j] += a;
+	A_[i][j] += (T)a;
 }
 
 template < typename T, typename Invert >

@@ -3,7 +3,7 @@
 /* -*- charset: utf-8 -*- */
 /*$Id$*/
 
-/* Copyright (c) 2009-2010 Alexey Ozeritsky (Алексей Озерицкий)
+/* Copyright (c) 2009-2015 Alexey Ozeritsky
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -272,13 +272,28 @@ struct DoubleStore < Store, Store >
 	}
 };
 
+class SparseSolverAdder {
+public:
+	virtual ~SparseSolverAdder() {}
+	virtual void add(int i, int j, double a) = 0;
+};
+
+class SparseSolverTAdder : public SparseSolverAdder {
+	SparseSolverAdder & adder;
+public:
+	SparseSolverTAdder(SparseSolverAdder & adder) : adder(adder) {}
+	void add(int i, int j, double a) {
+		adder.add(j, i, a);
+	}
+};
+
 /**
  * Solver class.
  * В солвере может быть два контейнера с разными аллокаторами для обращения
  * и для умножения.
  */
 template < typename T, typename MultStore, typename InvStore = MultStore >
-class SparseSolver
+class SparseSolver : public SparseSolverAdder
 {
 protected:
 	typedef DoubleStore < MultStore, InvStore > store_t;
@@ -323,7 +338,7 @@ public:
 	 *  @param j - index
 	 *  @param a - value
 	 */
-	void add (int i, int j, T a);
+	void add (int i, int j, double a);
 
 	/**
 	 * Solve equation Ax = b.
