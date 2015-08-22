@@ -5,7 +5,7 @@
 using namespace std;
 using namespace linal;
 
-void init_a_b(double * a, double * b, int n)
+static void init_a_b(double * a, double * b, int n)
 {
 	for (int i = 0; i < n; ++i) {
 		a[i] = 1;
@@ -13,7 +13,7 @@ void init_a_b(double * a, double * b, int n)
 	}
 }
 
-int main()
+int test_blas(int argc, char * argv[])
 {
 	int n = 10000;
 	vector < double > a(n), b(n), c(n);

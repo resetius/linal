@@ -13,7 +13,7 @@
 using namespace linal;
 using namespace std;
 
-void usage (const char * n)
+static void usage (const char * n)
 {
 	fprintf (stderr, "%s [--threads|-t n] \
 [--task] [--dim] [--iters] --file file \n", n);
@@ -89,7 +89,7 @@ void do_test_sparse(FILE * f, int iters, bool mult, bool invert)
 	}
 }
 
-bool test_sparse (FILE * f, int iters, bool mult, bool invert)
+static bool test_sparse (FILE * f, int iters, bool mult, bool invert)
 {
 	char tag[4];
 	int size;
@@ -121,7 +121,7 @@ bool test_sparse (FILE * f, int iters, bool mult, bool invert)
 	return true;
 }
 
-int main (int argc, char * argv[])
+int test_sparse (int argc, char * argv[])
 {
 	bool result = true;
 	bool mult   = false;

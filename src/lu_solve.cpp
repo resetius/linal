@@ -1,7 +1,7 @@
 /* -*- charset: utf-8 -*- */
 /*$Id$*/
 
-/* Copyright (c) 2010 Alexey Ozeritsky
+/* Copyright (c) 2010-2015 Alexey Ozeritsky
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+
+#include "lu_solve.h"
 
 namespace linal {
 
@@ -142,75 +144,4 @@ void lu_build (double * L, double * U, const double * A, int n)
 }
 
 } /* namespace linal */
-
-#ifdef TEST
-#define N 10
-
-using namespace linal;
-
-static void mat_print (const double * A, int n)
-{
-	int i, j;
-	for (i = 0; i < n; ++i)
-	{
-		for (j = 0; j < n; ++j)
-		{
-			fprintf (stderr, "%8.3lf ", A[i * n + j]);
-		}
-		fprintf (stderr, "\n");
-	}
-}
-
-int main()
-{
-	double * A = (double *)malloc (N * N * sizeof (double) );
-	double * L = (double *)malloc (N * N * sizeof (double) );
-	double * U = (double *)malloc (N * N * sizeof (double) );
-	int i, j, k;
-	int n = N;
-
-	for (i = 0; i < n; ++i)
-	{
-		for (j = 0; j < n; ++j)
-		{
-			A[i * n + j] = 1.0 / (1.0 + i + j);
-			if (i > j)
-			{
-				A[i * n + j] *= -1.0;
-			}
-		}
-	}
-
-	fprintf (stderr, "A:\n");
-	mat_print (A, n);
-	lu_build (L, U, A, n);
-	fprintf (stderr, "L:\n");
-	mat_print (L, n);
-	fprintf (stderr, "U:\n");
-	mat_print (U, n);
-
-	for (i = 0; i < n; ++i)
-	{
-		for (j = 0; j < n; ++j)
-		{
-			double s = 0;
-
-			for (k = 0; k < n; ++k)
-			{
-				s += L[i * n + k] * U[k * n + j];
-			}
-
-			A[i * n + j] = s;
-		}
-	}
-	fprintf (stderr, "LU:\n");
-	mat_print (A, n);
-
-	free (A);
-	free (L);
-	free (U);
-
-	return 1;
-}
-#endif
 

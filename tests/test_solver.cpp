@@ -12,7 +12,7 @@
 using namespace linal;
 using namespace std;
 
-void usage (const char * n)
+static void usage (const char * n)
 {
 	fprintf (stderr, "%s [--threads|-t n] [--double|-d] \
 [--task] [--dim] [--iters]\n", n);
@@ -25,12 +25,12 @@ void usage (const char * n)
 	exit (-1);
 }
 
-bool check (float val)
+static bool check(float val)
 {
 	return fabs (val) < 1e-5;
 }
 
-bool check (double val)
+static bool check(double val)
 {
 	return fabs (val) < 1e-12;
 }
@@ -271,7 +271,7 @@ bool test_simple_mult (int n, int iters)
 
 }
 
-int main (int argc, char * argv[])
+int test_solver (int argc, char * argv[])
 {
 	bool result        = true;
 	bool use_double    = false;
