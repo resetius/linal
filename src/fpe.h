@@ -29,6 +29,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <math.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -43,14 +45,15 @@ extern "C"
  */
 void set_fpe_except();
 
-#ifdef WIN32
-#include <float.h>
-#define isnan _isnan
-__inline bool isinf (double x)
-{
-	int c = _fpclass (x);
-	return (c == _FPCLASS_NINF || c == _FPCLASS_PINF);
-}
+int la_isnan(double x);
+int la_isinf(double x);
+
+#ifndef isnan
+#define isnan(x) la_isnan(x)
+#endif
+
+#ifndef isinf
+#define isinf(x) la_isinf(x)
 #endif
 
 /** @} */

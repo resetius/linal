@@ -1,8 +1,9 @@
 #include <float.h>
+#include <math.h>
 
 #ifdef WIN32
 #include <windows.h>
-extern "C" void set_fpe_except()
+void set_fpe_except()
 {
 	int cw = _controlfp (0, 0);
 	cw &= ~ (EM_OVERFLOW | EM_UNDERFLOW | EM_ZERODIVIDE | EM_DENORMAL | EM_INVALID);
@@ -41,7 +42,7 @@ PC   - Precision Control
 Source: Intel Architecture Software Development Manual, Volume 1, Basic Architecture
 */
 
-extern "C" void set_fpe_except()
+void set_fpe_except()
 {
 	//http://www.website.masmforum.com/tutorials/fptute/fpuchap1.htm
 	unsigned m = 0;
@@ -60,3 +61,11 @@ extern "C" void set_fpe_except()
 	asm ("ldmxcsr %0" : : "m" (*&m) );
 }
 #endif
+
+int la_isnan(double x) {
+	return isnan(x);
+}
+
+int la_isinf(double x) {
+	return isinf(x);
+}

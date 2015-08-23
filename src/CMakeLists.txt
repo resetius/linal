@@ -12,7 +12,7 @@ set(SOURCE
 	pow.h
 	timer.cpp
 	timer.h
-	fpe.cpp
+	fpe.c
 	fpe.h
 	array.h
 
